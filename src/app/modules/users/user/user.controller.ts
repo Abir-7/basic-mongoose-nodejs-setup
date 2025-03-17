@@ -18,7 +18,10 @@ const createUser = catchAsync(async (req, res) => {
 const updateProfileImage = catchAsync(async (req, res) => {
   const filePath = req.file?.path;
 
-  const result = await UserService.updateProfileImage(filePath as string);
+  const result = await UserService.updateProfileImage(
+    filePath as string,
+    req.user.userEmail
+  );
   sendResponse(res, {
     success: true,
     statusCode: status.OK,
@@ -27,4 +30,23 @@ const updateProfileImage = catchAsync(async (req, res) => {
   });
 });
 
-export const UserController = { createUser, updateProfileImage };
+const updateProfileData = catchAsync(async (req, res) => {
+  const userData = req.body;
+
+  const result = await UserService.updateProfileData(
+    userData,
+    req.user.userEmail
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "Profile info updated successfully.",
+    data: result,
+  });
+});
+
+export const UserController = {
+  createUser,
+  updateProfileImage,
+  updateProfileData,
+};
