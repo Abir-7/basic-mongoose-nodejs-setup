@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
-import { appConfig } from "../config";
+
 import AppError from "../errors/AppError";
 import mongoose from "mongoose";
 import { handleZodError } from "../errors/zodErrorHandler";
-import { handleMongooseError } from "../errors/mongooseErrorHandler";
+
 import { ZodError } from "zod";
 import multer from "multer";
 import multerErrorHandler from "../errors/MulterErrorHandler";
@@ -22,16 +22,38 @@ export const globalErrorHandler = async (
   let message = err.message || "Something went wrong!";
   let errors: any = [];
 
-  if (err instanceof mongoose.Error) {
-    const mongooseError = handleMongooseError(err);
-    statusCode = mongooseError.statusCode;
-    message = mongooseError.message;
-    errors = mongooseError.errors;
+  if (err instanceof mongoose.Error.ValidationError) {
+    statusCode = 400;
+    message = "Validation failed";
+    errors = Object.values(err.errors).map((error: any) => ({
+      field: error.path,
+      message: error.message,
+    }));
+  } else if (err.code === 11000) {
+    statusCode = 400;
+    message = `${Object.keys(err.keyValue).join(", ")} already exist`;
+    errors = [
+      {
+        field: "",
+        message: `Duplicate key error: ${Object.keys(err.keyValue).join(", ")}`,
+      },
+    ];
+  } else if (err instanceof mongoose.Error.CastError) {
+    statusCode = 400;
+    message = `Invalid value for ${err.path}`;
+    errors = [
+      {
+        field: err.path,
+        message: `Invalid value for ${err.path}`,
+      },
+    ];
   } else if (err?.name === "ValidationError") {
-    const mongooseError = handleMongooseError(err);
-    statusCode = mongooseError.statusCode;
-    message = mongooseError.message;
-    errors = mongooseError.errors;
+    statusCode = 400;
+    message = "Validation failed";
+    errors = Object.values(err.errors).map((error: any) => ({
+      field: error.path,
+      message: error.message,
+    }));
   } else if (err instanceof ZodError) {
     const zodError = handleZodError(err);
     statusCode = zodError.statusCode;
@@ -69,7 +91,8 @@ export const globalErrorHandler = async (
       },
     ];
   }
-  logger.error(message);
+
+  logger.error(err);
   res.status(statusCode).json({
     success: false,
     status: statusCode,
