@@ -3,6 +3,7 @@ import { appConfig } from "../config";
 import { userRoles } from "../interface/auth.interface";
 import { AdminProfile } from "../modules/users/adminProfile/adminProfile.model";
 import User from "../modules/users/user/user.model";
+import logger from "../utils/logger";
 
 const superUser = {
   role: userRoles.ADMIN,
@@ -30,14 +31,19 @@ const seedAdmin = async (): Promise<void> => {
       await AdminProfile.create([{ ...superUserProfile, user: data[0]._id }], {
         session,
       });
+      logger.info("Admin Created");
+    } else {
+      logger.info("Admin already created");
     }
 
     await session.commitTransaction();
-  } catch (error) {
-    await session.abortTransaction();
-    throw error; // or handle the error as needed
-  } finally {
     session.endSession();
+  } catch (error) {
+    logger.error("Faield to create Admin");
+
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
 };
 
