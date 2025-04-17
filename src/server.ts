@@ -20,7 +20,7 @@ process.on("unhandledRejection", (err) => {
 const main = async () => {
   await mongoose.connect(appConfig.database.dataBase_uri as string);
   logger.info("MongoDB connected");
-  seedAdmin();
+await seedAdmin();
   server.listen(
     Number(appConfig.server.port),
     appConfig.server.ip as string,
