@@ -106,7 +106,7 @@ const verifyUser = async (
       {
         "authentication.otp": null,
         "authentication.expDate": expDate,
-        "authentication.needToResetPass": true,
+        needToResetPass: true,
         "authentication.token": token,
       },
       { new: true }
@@ -211,7 +211,7 @@ const resetPassword = async (
     { email: decode.userEmail },
     {
       password: hassedPassword,
-      authentication: { opt: null, token: null, expDate: null },
+      authentication: { opt: null, token: null, expDate: null },   needToResetPass: false,
     },
     { new: true }
   );
