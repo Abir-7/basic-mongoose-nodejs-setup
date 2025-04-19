@@ -4,6 +4,7 @@ import { userRoles } from "../interface/auth.interface";
 import { AdminProfile } from "../modules/users/adminProfile/adminProfile.model";
 import User from "../modules/users/user/user.model";
 import logger from "../utils/logger";
+import getHashedPassword from "../utils/helper/getHashedPassword";
 
 const superUser = {
   role: userRoles.ADMIN,
@@ -20,7 +21,7 @@ const superUserProfile = {
 const seedAdmin = async (): Promise<void> => {
   const session = await mongoose.startSession();
   session.startTransaction();
-
+  superUser.password = await getHashedPassword(superUser.password as string);
   try {
     const isExistSuperAdmin = await User.findOne({
       role: userRoles.ADMIN,
