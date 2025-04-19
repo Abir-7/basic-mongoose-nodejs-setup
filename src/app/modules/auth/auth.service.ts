@@ -211,7 +211,7 @@ const resetPassword = async (
     { email: decode.userEmail },
     {
       password: hassedPassword,
-      authentication: { opt: null, token: null, expDate: null },   needToResetPass: false,
+      authentication: { otp: null, token: null, expDate: null },   needToResetPass: false,
     },
     { new: true }
   );
@@ -298,11 +298,32 @@ const updatePassword = async (
   return { user: user.email, message: "Password successfully updated." };
 };
 
+const reSendOtp = async (userEmail: string) => {
+  const OTP = getOtp(4);
+
+  const updateUser = await User.findOneAndUpdate(
+    { email: userEmail },
+    {
+      $set: {
+        "authentication.otp": OTP,
+        "authentication.expDate": new Date(Date.now() + 10 * 60 * 1000), //10min
+      },
+    },
+    { new: true }
+  );
+
+  if (!updateUser) {
+    throw new AppError(500, "Failed to Send. Try Again!");
+  }
+
+  await sendEmail(userEmail, "Verification Code", `CODE: ${OTP}`);
+  return { message: "Verification Send" };
+};
 export const AuthService = {
   userLogin,
   verifyUser,
   forgotPasswordRequest,
   resetPassword,
   getNewAccessToken,
-  updatePassword,
+  updatePassword,  reSendOtp,
 };
