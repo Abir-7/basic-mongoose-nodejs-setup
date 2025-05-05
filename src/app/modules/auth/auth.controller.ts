@@ -100,5 +100,5 @@ export const AuthController = {
   resetPassword,
   userLogin,
   getNewAccessToken,
-  updatePassword,
+  updatePassword,reSendOtp
 };
