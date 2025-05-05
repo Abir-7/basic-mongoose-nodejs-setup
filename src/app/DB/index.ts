@@ -44,7 +44,7 @@ const seedAdmin = async (): Promise<void> => {
 
     await session.abortTransaction();
     session.endSession();
-    throw error;
+    //throw error;
   }
 };
 
