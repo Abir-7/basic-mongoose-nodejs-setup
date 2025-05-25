@@ -11,6 +11,71 @@ import getOtp from "../../utils/helper/getOtp";
 import { sendEmail } from "../../utils/sendEmail";
 import getHashedPassword from "../../utils/helper/getHashedPassword";
 import { appConfig } from "../../config";
+import { IUser } from "../users/user/user.interface";
+import mongoose from "mongoose";
+
+const createUser = async (data: {
+  email: string;
+  fullName: string;
+  password: string;
+}): Promise<Partial<IUser>> => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const isExist = await User.findOne({ email: data.email }).session(session);
+
+    if (isExist && isExist.isVerified === true) {
+      throw new AppError(status.BAD_REQUEST, "User already exist");
+    }
+
+    if (isExist && isExist.isVerified === false) {
+      await User.findOneAndDelete({ _id: isExist._id }).session(session);
+      await UserProfile.findOneAndDelete({ user: isExist._id }).session(
+        session
+      );
+    }
+
+    const hashedPassword = await getHashedPassword(data.password);
+    const otp = getOtp(4);
+    const expDate = getExpiryTime(10);
+
+    const userData = {
+      email: data.email,
+      password: hashedPassword,
+      authentication: { otp, expDate },
+    };
+
+    const createdUser = await User.create([{ ...userData, role: "USER" }], {
+      session,
+    });
+
+    const userProfileData = {
+      fullName: data.fullName,
+      email: createdUser[0].email,
+      user: createdUser[0]._id,
+    };
+    await UserProfile.create([userProfileData], { session });
+
+    await sendEmail(
+      data.email,
+      "Email Verification Code",
+      `Your code is: ${otp}`
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return {
+      email: createdUser[0].email,
+      isVerified: createdUser[0].isVerified,
+    };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
 
 const userLogin = async (loginData: {
   email: string;
@@ -74,25 +139,25 @@ const verifyUser = async (
   if (!otp) {
     throw new AppError(status.BAD_REQUEST, "Give the Code. Check your email.");
   }
-  const user = (await UserProfile.findOne({ email }).populate("user")) as any;
+  const user = await User.findOne({ email });
   if (!user) {
     throw new AppError(status.BAD_REQUEST, "User not found");
   }
 
   const currentDate = new Date();
-  const expirationDate = new Date(user.user.authentication.expDate);
+  const expirationDate = new Date(user.authentication.expDate);
 
   if (currentDate > expirationDate) {
     throw new AppError(status.BAD_REQUEST, "Code time expired.");
   }
 
-  if (otp !== user.user.authentication.otp) {
+  if (otp !== user.authentication.otp) {
     throw new AppError(status.BAD_REQUEST, "Code not matched.");
   }
 
   let updatedUser;
   let token = null;
-  if (user.user.isVerified) {
+  if (user.isVerified) {
     token = jsonWebToken.generateToken(
       { userEmail: user.email },
       appConfig.jwt.jwt_access_secret as string,
@@ -136,6 +201,7 @@ const forgotPasswordRequest = async (
   email: string
 ): Promise<{ email: string }> => {
   const user = await User.findOne({ email });
+
   if (!user) {
     throw new AppError(status.BAD_REQUEST, "Email not found.");
   }
@@ -211,7 +277,8 @@ const resetPassword = async (
     { email: decode.userEmail },
     {
       password: hassedPassword,
-      authentication: { otp: null, token: null, expDate: null },   needToResetPass: false,
+      authentication: { otp: null, token: null, expDate: null },
+      needToResetPass: false,
     },
     { new: true }
   );
@@ -320,10 +387,12 @@ const reSendOtp = async (userEmail: string) => {
   return { message: "Verification code send." };
 };
 export const AuthService = {
+  createUser,
   userLogin,
   verifyUser,
   forgotPasswordRequest,
   resetPassword,
   getNewAccessToken,
-  updatePassword,  reSendOtp,
+  updatePassword,
+  reSendOtp,
 };

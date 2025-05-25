@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from "mongoose";
 import { appConfig } from "../config";
 import { userRoles } from "../interface/auth.interface";
-import { AdminProfile } from "../modules/users/adminProfile/adminProfile.model";
+
 import User from "../modules/users/user/user.model";
 import logger from "../utils/logger";
 import getHashedPassword from "../utils/helper/getHashedPassword";
+import { UserProfile } from "../modules/users/userProfile/userProfile.model";
 
 const superUser = {
   role: userRoles.ADMIN,
@@ -29,7 +31,7 @@ const seedAdmin = async (): Promise<void> => {
 
     if (!isExistSuperAdmin) {
       const data = await User.create([superUser], { session });
-      await AdminProfile.create([{ ...superUserProfile, user: data[0]._id }], {
+      await UserProfile.create([{ ...superUserProfile, user: data[0]._id }], {
         session,
       });
       logger.info("Admin Created");
@@ -39,8 +41,8 @@ const seedAdmin = async (): Promise<void> => {
 
     await session.commitTransaction();
     session.endSession();
-  } catch (error) {
-    logger.error("Faield to create Admin");
+  } catch (error: any) {
+    logger.error(`Faield to create Admin.${error} `);
 
     await session.abortTransaction();
     session.endSession();

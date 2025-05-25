@@ -13,36 +13,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
+const http_status_1 = __importDefault(require("http-status"));
+const AppError_1 = __importDefault(require("../../../errors/AppError"));
 const getRelativeFilePath_1 = require("../../../middleware/fileUpload/getRelativeFilePath");
-const getExpiryTime_1 = __importDefault(require("../../../utils/helper/getExpiryTime"));
-const getHashedPassword_1 = __importDefault(require("../../../utils/helper/getHashedPassword"));
-const getOtp_1 = __importDefault(require("../../../utils/helper/getOtp"));
-const sendEmail_1 = require("../../../utils/sendEmail");
 const userProfile_model_1 = require("../userProfile/userProfile.model");
 const user_model_1 = __importDefault(require("./user.model"));
-const createUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const hashedPassword = yield (0, getHashedPassword_1.default)(data.password);
-    const otp = (0, getOtp_1.default)(4);
-    const expDate = (0, getExpiryTime_1.default)(10);
-    //user data
-    const userData = {
-        email: data.email,
-        password: hashedPassword,
-        authentication: { otp, expDate },
-    };
-    const createdUser = yield user_model_1.default.create(userData);
-    //user profile data
-    const userProfileData = {
-        fullName: data.fullName,
-        email: createdUser.email,
-        user: createdUser._id,
-    };
-    yield userProfile_model_1.UserProfile.create(userProfileData);
-    yield (0, sendEmail_1.sendEmail)(data.email, "Email Verification Code", `Your code is: ${otp}`);
-    return { email: createdUser.email, isVerified: createdUser.isVerified };
-});
-const updateProfileImage = (path) => __awaiter(void 0, void 0, void 0, function* () {
+const removeFalsyField_1 = require("../../../utils/helper/removeFalsyField");
+const unlinkFiles_1 = __importDefault(require("../../../utils/unlinkFiles"));
+const updateProfileImage = (path, email) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.default.findOne({ email: email });
     const image = (0, getRelativeFilePath_1.getRelativePath)(path);
-    return image;
+    if (!image) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Image not found.");
+    }
+    if (!user) {
+        (0, unlinkFiles_1.default)(image);
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found.");
+    }
+    const updated = yield userProfile_model_1.UserProfile.findOneAndUpdate({ user: user._id }, { image }, { new: true });
+    if (!updated) {
+        (0, unlinkFiles_1.default)(image);
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Failed to update image.");
+    }
+    return updated;
 });
-exports.UserService = { createUser, updateProfileImage };
+const updateProfileData = (userdata, email) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.default.findOne({ email: email });
+    if (!user) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found.");
+    }
+    const data = (0, removeFalsyField_1.removeFalsyFields)(userdata);
+    let updated = yield userProfile_model_1.UserProfile.findOneAndUpdate({ user: user._id }, data, {
+        new: true,
+    });
+    if (!updated) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Failed to update user info.");
+    }
+    return updated;
+});
+exports.UserService = {
+    updateProfileImage,
+    updateProfileData,
+};

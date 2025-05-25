@@ -4,7 +4,18 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { AuthService } from "./auth.service";
 import { appConfig } from "../../config";
-import logger from "../../utils/logger";
+
+const createUser = catchAsync(async (req, res) => {
+  const userData = req.body;
+  const result = await AuthService.createUser(userData);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "User successfully created.Check your email for code.",
+    data: result,
+  });
+});
 
 const userLogin = catchAsync(async (req, res, next) => {
   const result = await AuthService.userLogin(req.body);
@@ -95,10 +106,12 @@ const reSendOtp = catchAsync(async (req, res) => {
 });
 
 export const AuthController = {
+  createUser,
   verifyUser,
   forgotPasswordRequest,
   resetPassword,
   userLogin,
   getNewAccessToken,
-  updatePassword,reSendOtp
+  updatePassword,
+  reSendOtp,
 };

@@ -2,7 +2,16 @@ import { Router } from "express";
 import { AuthController } from "./auth.controller";
 import { auth } from "../../middleware/auth/auth";
 
+import zodValidator from "../../middleware/zodValidator";
+import { zodCreateUserSchema } from "./auth.validation";
+
 const router = Router();
+
+router.post(
+  "/create-user",
+  zodValidator(zodCreateUserSchema),
+  AuthController.createUser
+);
 
 router.get("/get-access-token", AuthController.getNewAccessToken);
 

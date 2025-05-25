@@ -35,4 +35,8 @@ export const appConfig = {
     email: process.env.ADMIN_EMAIL,
     password: process.env.ADMIN_PASSWORD,
   },
+  ai_key: {
+    gemini: process.env.GEMINI_KEY,
+    open_ai: process.env.GPT_KEY,
+  },
 };

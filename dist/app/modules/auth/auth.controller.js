@@ -19,6 +19,16 @@ const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const auth_service_1 = require("./auth.service");
 const config_1 = require("../../config");
+const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userData = req.body;
+    const result = yield auth_service_1.AuthService.createUser(userData);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "User successfully created.Check your email for code.",
+        data: result,
+    });
+}));
 const userLogin = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield auth_service_1.AuthService.userLogin(req.body);
     res.cookie("refreshToken", result.refreshToken, {
@@ -83,11 +93,23 @@ const updatePassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         message: "Password successfully updated",
     });
 }));
+const reSendOtp = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email } = req.body;
+    const result = yield auth_service_1.AuthService.reSendOtp(email);
+    (0, sendResponse_1.default)(res, {
+        data: result,
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: "Verification Code send successfully",
+    });
+}));
 exports.AuthController = {
+    createUser,
     verifyUser,
     forgotPasswordRequest,
     resetPassword,
     userLogin,
     getNewAccessToken,
     updatePassword,
+    reSendOtp,
 };

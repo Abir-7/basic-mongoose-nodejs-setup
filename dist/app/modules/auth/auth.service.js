@@ -24,6 +24,50 @@ const getOtp_1 = __importDefault(require("../../utils/helper/getOtp"));
 const sendEmail_1 = require("../../utils/sendEmail");
 const getHashedPassword_1 = __importDefault(require("../../utils/helper/getHashedPassword"));
 const config_1 = require("../../config");
+const mongoose_1 = __importDefault(require("mongoose"));
+const createUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
+    try {
+        const isExist = yield user_model_1.default.findOne({ email: data.email }).session(session);
+        if (isExist && isExist.isVerified === true) {
+            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User already exist");
+        }
+        if (isExist && isExist.isVerified === false) {
+            yield user_model_1.default.findOneAndDelete({ _id: isExist._id }).session(session);
+            yield userProfile_model_1.UserProfile.findOneAndDelete({ user: isExist._id }).session(session);
+        }
+        const hashedPassword = yield (0, getHashedPassword_1.default)(data.password);
+        const otp = (0, getOtp_1.default)(4);
+        const expDate = (0, getExpiryTime_1.default)(10);
+        const userData = {
+            email: data.email,
+            password: hashedPassword,
+            authentication: { otp, expDate },
+        };
+        const createdUser = yield user_model_1.default.create([Object.assign(Object.assign({}, userData), { role: "USER" })], {
+            session,
+        });
+        const userProfileData = {
+            fullName: data.fullName,
+            email: createdUser[0].email,
+            user: createdUser[0]._id,
+        };
+        yield userProfile_model_1.UserProfile.create([userProfileData], { session });
+        yield (0, sendEmail_1.sendEmail)(data.email, "Email Verification Code", `Your code is: ${otp}`);
+        yield session.commitTransaction();
+        session.endSession();
+        return {
+            email: createdUser[0].email,
+            isVerified: createdUser[0].isVerified,
+        };
+    }
+    catch (error) {
+        yield session.abortTransaction();
+        session.endSession();
+        throw error;
+    }
+});
 const userLogin = (loginData) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = yield user_model_1.default.findOne({ email: loginData.email }).select("+password");
     if (!userData) {
@@ -73,7 +117,7 @@ const verifyUser = (email, otp) => __awaiter(void 0, void 0, void 0, function* (
         updatedUser = yield user_model_1.default.findOneAndUpdate({ email: user.email }, {
             "authentication.otp": null,
             "authentication.expDate": expDate,
-            "authentication.needToResetPass": true,
+            needToResetPass: true,
             "authentication.token": token,
         }, { new: true });
     }
@@ -130,7 +174,8 @@ const resetPassword = (token, userData) => __awaiter(void 0, void 0, void 0, fun
     const hassedPassword = yield (0, getHashedPassword_1.default)(new_password);
     const updateData = yield user_model_1.default.findOneAndUpdate({ email: decode.userEmail }, {
         password: hassedPassword,
-        authentication: { opt: null, token: null, expDate: null },
+        authentication: { otp: null, token: null, expDate: null },
+        needToResetPass: false,
     }, { new: true });
     if (!updateData) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Failed to reset password. Try again.");
@@ -177,11 +222,27 @@ const updatePassword = (userId, passData) => __awaiter(void 0, void 0, void 0, f
     yield user.save();
     return { user: user.email, message: "Password successfully updated." };
 });
+const reSendOtp = (userEmail) => __awaiter(void 0, void 0, void 0, function* () {
+    const OTP = (0, getOtp_1.default)(4);
+    const updateUser = yield user_model_1.default.findOneAndUpdate({ email: userEmail }, {
+        $set: {
+            "authentication.otp": OTP,
+            "authentication.expDate": new Date(Date.now() + 10 * 60 * 1000), //10min
+        },
+    }, { new: true });
+    if (!updateUser) {
+        throw new AppError_1.default(500, "Failed to Send. Try Again!");
+    }
+    yield (0, sendEmail_1.sendEmail)(userEmail, "Verification Code", `CODE: ${OTP}`);
+    return { message: "Verification code send." };
+});
 exports.AuthService = {
+    createUser,
     userLogin,
     verifyUser,
     forgotPasswordRequest,
     resetPassword,
     getNewAccessToken,
     updatePassword,
+    reSendOtp,
 };

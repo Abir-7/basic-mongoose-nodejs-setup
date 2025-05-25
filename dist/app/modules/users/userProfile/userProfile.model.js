@@ -6,7 +6,6 @@ const userProfileSchema = new mongoose_1.Schema({
     fullName: { type: String },
     nickname: { type: String },
     dateOfBirth: { type: Date },
-    email: { type: String, unique: true },
     phone: { type: String },
     address: { type: String },
     image: { type: String },
