@@ -19,13 +19,14 @@ const corsOption = {
 };
 
 app.use(helmet());
+app.use(morgan("combined"));
+app.use(compression());
 app.use(cors(corsOption));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(limiter);
-app.use(morgan("combined"));
-app.use(compression());
+
 app.use("/api", router);
 
 app.get("/", (req, res) => {
