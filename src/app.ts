@@ -13,7 +13,7 @@ import morgan from "morgan";
 const app = express();
 
 const corsOption = {
-  origin: ["*"],
+  origin: ["*"], // need to add real htp link like "https://yourdomain.com", "http://localhost:3000"
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   credentials: true,
 };
