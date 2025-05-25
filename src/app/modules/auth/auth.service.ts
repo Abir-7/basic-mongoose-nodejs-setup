@@ -13,6 +13,7 @@ import getHashedPassword from "../../utils/helper/getHashedPassword";
 import { appConfig } from "../../config";
 import { IUser } from "../users/user/user.interface";
 import mongoose from "mongoose";
+import { isTimeExpired } from "../../utils/helper/isTimeExpire";
 
 const createUser = async (data: {
   email: string;
@@ -144,10 +145,9 @@ const verifyUser = async (
     throw new AppError(status.BAD_REQUEST, "User not found");
   }
 
-  const currentDate = new Date();
-  const expirationDate = new Date(user.authentication.expDate);
+  const expirationDate = user.authentication.expDate;
 
-  if (currentDate > expirationDate) {
+  if (isTimeExpired(expirationDate)) {
     throw new AppError(status.BAD_REQUEST, "Code time expired.");
   }
 
@@ -365,7 +365,13 @@ const updatePassword = async (
   return { user: user.email, message: "Password successfully updated." };
 };
 
-const reSendOtp = async (userEmail: string) => {
+const reSendOtp = async (userEmail: string): Promise<{ message: string }> => {
+  const userData = await User.findOne({ email: userEmail });
+
+  if (!userData?.authentication.otp) {
+    throw new AppError(500, "Don't find any expired code");
+  }
+
   const OTP = getOtp(4);
 
   const updateUser = await User.findOneAndUpdate(

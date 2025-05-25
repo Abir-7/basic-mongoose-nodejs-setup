@@ -13,7 +13,7 @@ router.post(
   AuthController.createUser
 );
 
-router.get("/get-access-token", AuthController.getNewAccessToken);
+router.post("/get-access-token", AuthController.getNewAccessToken);
 
 router.post("/login", AuthController.userLogin);
 

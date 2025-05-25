@@ -39,4 +39,7 @@ export const appConfig = {
     gemini: process.env.GEMINI_KEY,
     open_ai: process.env.GPT_KEY,
   },
+  encrypt: {
+    s_key: process.env.ENCRYPTION_SECRET_KEY,
+  },
 };
