@@ -3,7 +3,7 @@
 import server from "./app";
 import { appConfig } from "./app/config";
 import mongoose from "mongoose";
-import logger from "./app/utils/logger";
+import logger from "./app/utils/serverTools/logger";
 import seedAdmin from "./app/DB";
 
 process.on("uncaughtException", (err) => {
@@ -20,7 +20,10 @@ process.on("unhandledRejection", (err) => {
 const main = async () => {
   await mongoose.connect(appConfig.database.dataBase_uri as string);
   logger.info("MongoDB connected");
-await seedAdmin();
+  await seedAdmin();
+  // Wait up to 15 minutes for request to finish uploading //
+  server.setTimeout(15 * 60 * 1000);
+  //------------------------//
   server.listen(
     Number(appConfig.server.port),
     appConfig.server.ip as string,

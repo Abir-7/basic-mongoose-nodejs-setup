@@ -3,9 +3,13 @@ import cors from "cors";
 import router from "./app/routes";
 import http from "http";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
-import { noRouteFound } from "./app/utils/noRouteFound";
+import { noRouteFound } from "./app/utils/serverTools/noRouteFound";
 import cookieParser from "cookie-parser";
 import path from "path";
+import compression from "compression";
+import { limiter } from "./app/utils/serverTools/rateLimite";
+import helmet from "helmet";
+import morgan from "morgan";
 const app = express();
 
 const corsOption = {
@@ -14,15 +18,18 @@ const corsOption = {
   credentials: true,
 };
 
+app.use(helmet());
 app.use(cors(corsOption));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(limiter);
+app.use(morgan("combined"));
+app.use(compression());
 app.use("/api", router);
 
 app.get("/", (req, res) => {
-  res.send("Hello World! This app name is Ai_Finance_Hub");
+  res.send("Hello World! This app name is TEST");
 });
 
 app.use(express.static(path.join(process.cwd(), "uploads")));

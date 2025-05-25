@@ -10,7 +10,7 @@ import { handleZodError } from "../errors/zodErrorHandler";
 import { ZodError } from "zod";
 import multer from "multer";
 import multerErrorHandler from "../errors/MulterErrorHandler";
-import logger from "../utils/logger";
+import logger from "../utils/serverTools/logger";
 
 export const globalErrorHandler = async (
   err: any,

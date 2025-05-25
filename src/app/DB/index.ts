@@ -4,7 +4,7 @@ import { appConfig } from "../config";
 import { userRoles } from "../interface/auth.interface";
 
 import User from "../modules/users/user/user.model";
-import logger from "../utils/logger";
+import logger from "../utils/serverTools/logger";
 import getHashedPassword from "../utils/helper/getHashedPassword";
 import { UserProfile } from "../modules/users/userProfile/userProfile.model";
 

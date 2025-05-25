@@ -2,7 +2,7 @@ import status from "http-status";
 import AppError from "../../../errors/AppError";
 import { getRelativePath } from "../../../middleware/fileUpload/getRelativeFilePath";
 import User from "../user/user.model";
-import unlinkFile from "../../../utils/unlinkFiles";
+import unlinkFile from "../../../middleware/fileUpload/unlinkFiles";
 import { UserProfile } from "./userProfile.model";
 import { IUserProfile } from "./userProfile.interface";
 import { removeFalsyFields } from "../../../utils/helper/removeFalsyField";

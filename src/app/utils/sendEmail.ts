@@ -7,7 +7,7 @@ import HttpStatus from "http-status";
 
 import AppError from "../errors/AppError";
 import { appConfig } from "../config";
-import logger from "./logger";
+import logger from "./serverTools/logger";
 
 export async function sendEmail(email: string, subject: string, text: string) {
   try {

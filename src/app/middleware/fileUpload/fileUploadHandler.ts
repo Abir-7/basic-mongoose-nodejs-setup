@@ -3,7 +3,7 @@ import multer, { FileFilterCallback } from "multer";
 import path from "path";
 import fs from "fs";
 import { appConfig } from "../../config";
-import logger from "../../utils/logger";
+import logger from "../../utils/serverTools/logger";
 
 // Allow only these file types
 const allowedMimeTypes = [
@@ -81,7 +81,8 @@ const fileFilter = (
   file: Express.Multer.File,
   cb: FileFilterCallback
 ) => {
-  logger.info(`Uploading:${(file.originalname, file.mimetype)}`);
+  logger.info(`Uploading: ${file.originalname} (${file.mimetype})`);
+
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
