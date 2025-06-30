@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const http_status_1 = __importDefault(require("http-status"));
-const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
-const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
+const catchAsync_1 = __importDefault(require("../../utils/serverTools/catchAsync"));
+const sendResponse_1 = __importDefault(require("../../utils/serverTools/sendResponse"));
 const auth_service_1 = require("./auth.service");
 const config_1 = require("../../config");
 const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -74,7 +74,7 @@ const resetPassword = (0, catchAsync_1.default)((req, res, next) => __awaiter(vo
     });
 }));
 const getNewAccessToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
     const result = yield auth_service_1.AuthService.getNewAccessToken(refreshToken);
     (0, sendResponse_1.default)(res, {
         data: result,

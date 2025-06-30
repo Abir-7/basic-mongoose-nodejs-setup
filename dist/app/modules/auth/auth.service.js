@@ -25,6 +25,7 @@ const sendEmail_1 = require("../../utils/sendEmail");
 const getHashedPassword_1 = __importDefault(require("../../utils/helper/getHashedPassword"));
 const config_1 = require("../../config");
 const mongoose_1 = __importDefault(require("mongoose"));
+const isTimeExpire_1 = require("../../utils/helper/isTimeExpire");
 const createUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
@@ -97,21 +98,20 @@ const verifyUser = (email, otp) => __awaiter(void 0, void 0, void 0, function* (
     if (!otp) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Give the Code. Check your email.");
     }
-    const user = (yield userProfile_model_1.UserProfile.findOne({ email }).populate("user"));
+    const user = yield user_model_1.default.findOne({ email });
     if (!user) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User not found");
     }
-    const currentDate = new Date();
-    const expirationDate = new Date(user.user.authentication.expDate);
-    if (currentDate > expirationDate) {
+    const expirationDate = user.authentication.expDate;
+    if ((0, isTimeExpire_1.isTimeExpired)(expirationDate)) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Code time expired.");
     }
-    if (otp !== user.user.authentication.otp) {
+    if (otp !== user.authentication.otp) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Code not matched.");
     }
     let updatedUser;
     let token = null;
-    if (user.user.isVerified) {
+    if (user.isVerified) {
         token = jwt_1.jsonWebToken.generateToken({ userEmail: user.email }, config_1.appConfig.jwt.jwt_access_secret, "10m");
         const expDate = (0, getExpiryTime_1.default)(10);
         updatedUser = yield user_model_1.default.findOneAndUpdate({ email: user.email }, {
@@ -223,6 +223,10 @@ const updatePassword = (userId, passData) => __awaiter(void 0, void 0, void 0, f
     return { user: user.email, message: "Password successfully updated." };
 });
 const reSendOtp = (userEmail) => __awaiter(void 0, void 0, void 0, function* () {
+    const userData = yield user_model_1.default.findOne({ email: userEmail });
+    if (!(userData === null || userData === void 0 ? void 0 : userData.authentication.otp)) {
+        throw new AppError_1.default(500, "Don't find any expired code");
+    }
     const OTP = (0, getOtp_1.default)(4);
     const updateUser = yield user_model_1.default.findOneAndUpdate({ email: userEmail }, {
         $set: {

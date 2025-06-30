@@ -14,31 +14,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
-const catchAsync_1 = __importDefault(require("../../../utils/catchAsync"));
-const sendResponse_1 = __importDefault(require("../../../utils/sendResponse"));
+const catchAsync_1 = __importDefault(require("../../../utils/serverTools/catchAsync"));
+const sendResponse_1 = __importDefault(require("../../../utils/serverTools/sendResponse"));
 const user_service_1 = require("./user.service");
-const updateProfileImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const filePath = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
-    const result = yield user_service_1.UserService.updateProfileImage(filePath, req.user.userEmail);
+const getMyData = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_service_1.UserService.getMyData(req.user.userId);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
-        message: "Profile image changed successfully.",
-        data: result,
-    });
-}));
-const updateProfileData = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userData = req.body;
-    const result = yield user_service_1.UserService.updateProfileData(userData, req.user.userEmail);
-    (0, sendResponse_1.default)(res, {
-        success: true,
-        statusCode: http_status_1.default.OK,
-        message: "Profile info updated successfully.",
+        message: "User data is fetched successfully",
         data: result,
     });
 }));
 exports.UserController = {
-    updateProfileImage,
-    updateProfileData,
+    getMyData,
 };

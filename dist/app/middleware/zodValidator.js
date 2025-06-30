@@ -12,9 +12,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
+const zod_1 = require("zod");
+const unlinkFiles_1 = __importDefault(require("./fileUpload/unlinkFiles"));
+const getRelativeFilePath_1 = require("./fileUpload/getRelativeFilePath");
+const catchAsync_1 = __importDefault(require("../utils/serverTools/catchAsync"));
 const zodValidator = (schema) => (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    yield schema.parseAsync({ body: req.body });
-    next();
+    var _a, _b;
+    try {
+        yield schema.parseAsync({ body: req.body });
+        next();
+    }
+    catch (error) {
+        if (error instanceof zod_1.ZodError) {
+            if ((_a = req.file) === null || _a === void 0 ? void 0 : _a.path) {
+                (0, unlinkFiles_1.default)((0, getRelativeFilePath_1.getRelativePath)((_b = req.file) === null || _b === void 0 ? void 0 : _b.path));
+            }
+            return next(error);
+        }
+        return next(error);
+    }
 }));
 exports.default = zodValidator;

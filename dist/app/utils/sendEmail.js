@@ -20,7 +20,7 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../errors/AppError"));
 const config_1 = require("../config");
-const logger_1 = __importDefault(require("./logger"));
+const logger_1 = __importDefault(require("./serverTools/logger"));
 function sendEmail(email, subject, text) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

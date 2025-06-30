@@ -8,7 +8,7 @@ const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const config_1 = require("../../config");
-const logger_1 = __importDefault(require("../../utils/logger"));
+const logger_1 = __importDefault(require("../../utils/serverTools/logger"));
 // Allow only these file types
 const allowedMimeTypes = [
     // Images
@@ -74,7 +74,7 @@ const storage = multer_1.default.diskStorage({
 });
 // File type filter
 const fileFilter = (req, file, cb) => {
-    logger_1.default.info(`Uploading:${(file.originalname, file.mimetype)}`);
+    logger_1.default.info(`Uploading: ${file.originalname} (${file.mimetype})`);
     if (allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true);
     }

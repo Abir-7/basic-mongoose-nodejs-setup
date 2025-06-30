@@ -19,7 +19,7 @@ const zodErrorHandler_1 = require("../errors/zodErrorHandler");
 const zod_1 = require("zod");
 const multer_1 = __importDefault(require("multer"));
 const MulterErrorHandler_1 = __importDefault(require("../errors/MulterErrorHandler"));
-const logger_1 = __importDefault(require("../utils/logger"));
+const logger_1 = __importDefault(require("../utils/serverTools/logger"));
 const globalErrorHandler = (err, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let statusCode = err.statusCode || 500;
     let message = err.message || "Something went wrong!";

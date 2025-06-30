@@ -7,6 +7,7 @@ exports.jsonWebToken = void 0;
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const jwt_decode_1 = require("jwt-decode");
 const verifyJwt = (token, secret) => {
     try {
         return jsonwebtoken_1.default.verify(token, secret);
@@ -26,7 +27,17 @@ const generateToken = (payload, secret, expiresIn) => {
         throw new Error(error);
     }
 };
+const decodeToken = (token) => {
+    try {
+        const decoded = (0, jwt_decode_1.jwtDecode)(token);
+        return decoded;
+    }
+    catch (error) {
+        throw new Error(error);
+    }
+};
 exports.jsonWebToken = {
     verifyJwt,
     generateToken,
+    decodeToken,
 };

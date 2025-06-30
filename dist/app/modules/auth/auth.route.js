@@ -11,7 +11,7 @@ const zodValidator_1 = __importDefault(require("../../middleware/zodValidator"))
 const auth_validation_1 = require("./auth.validation");
 const router = (0, express_1.Router)();
 router.post("/create-user", (0, zodValidator_1.default)(auth_validation_1.zodCreateUserSchema), auth_controller_1.AuthController.createUser);
-router.get("/get-access-token", auth_controller_1.AuthController.getNewAccessToken);
+router.post("/get-access-token", auth_controller_1.AuthController.getNewAccessToken);
 router.post("/login", auth_controller_1.AuthController.userLogin);
 router.patch("/verify-user", auth_controller_1.AuthController.verifyUser);
 router.patch("/forgot-password-request", auth_controller_1.AuthController.forgotPasswordRequest);
