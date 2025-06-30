@@ -22,17 +22,26 @@ const updateProfileImage = async (path: string, email: string) => {
     throw new AppError(status.NOT_FOUND, "User not found.");
   }
 
-  const updated = await UserProfile.findOneAndUpdate(
-    { user: user._id },
-    { image },
-    { new: true }
-  );
-  if (!updated) {
+  const userProfile = await UserProfile.findOne({ user: user.id });
+
+  if (!userProfile) {
+    unlinkFile(image);
+    throw new AppError(status.NOT_FOUND, "User profile not found.");
+  }
+
+  userProfile.image = image;
+
+  const savedData = await userProfile.save();
+
+  if (!savedData) {
     unlinkFile(image);
     throw new AppError(status.BAD_REQUEST, "Failed to update image.");
   }
 
-  return updated;
+  if (userProfile && userProfile.image) {
+    unlinkFile(userProfile.image);
+  }
+  return savedData;
 };
 
 const updateProfileData = async (
