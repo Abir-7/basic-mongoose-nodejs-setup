@@ -10,7 +10,8 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-
+    networks:
+      - mongo-cluster
 
   basic-node-express:
     build: .
@@ -23,6 +24,10 @@ services:
     volumes:
       - .:/app
     command: npm run dev
+    networks:
+      - mongo-cluster
 
-volumes:
-  pgdata: {}
+networks:
+  mongo-cluster:
+    external: true
+
