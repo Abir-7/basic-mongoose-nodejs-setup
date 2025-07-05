@@ -2,8 +2,9 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import amqplib from "amqplib";
 import logger from "../utils/serverTools/logger";
+import { appConfig } from "../config";
 
-const uri = process.env.RABBITMQ_URI as string;
+const uri = appConfig.rabbitMq.url as string;
 
 export const getChannel = async () => {
   try {
