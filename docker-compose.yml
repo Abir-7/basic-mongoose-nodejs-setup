@@ -3,7 +3,7 @@ version: "3.9"
 services:
   basic-node-rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmd-basic-node
+    container_name: basic-node-rabbitmq
     ports:
       - "5673:5672"  # Changed left port to avoid conflict with old project
       - "15673:15672" # Changed left port to avoid conflict with old project
@@ -20,7 +20,7 @@ services:
     env_file:
       - .env
     ports:
-      - "4001:4000" # Changed left port to avoid conflict with old project
+      - "4002:4000" # Changed left port to avoid conflict with old project
     volumes:
       - .:/app
     command: npm run dev

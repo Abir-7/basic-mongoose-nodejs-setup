@@ -62,7 +62,7 @@ const createUser = async (data: {
     await publishJob("emailQueue", {
       to: data.email,
       subject: "Email Verification Code",
-      body: otp,
+      body: otp.toString(),
     });
 
     await session.commitTransaction();

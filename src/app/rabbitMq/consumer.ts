@@ -16,6 +16,7 @@ export const consumeQueue = async (
   channel.consume(
     queueName,
     async (msg) => {
+      logger.info(`Message received in queue: ${queueName}`); // <-- Log here to confirm receipt
       if (msg) {
         const content = msg.content.toString();
         const data = JSON.parse(content);
@@ -24,7 +25,7 @@ export const consumeQueue = async (
           channel.ack(msg);
         } catch (error) {
           logger.error(`Error processing ${queueName}:`, error);
-          // optionally channel.nack(msg) to retry
+          channel.nack(msg, false, true); // Optionally retry the message
         }
       }
     },
