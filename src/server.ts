@@ -19,10 +19,11 @@ process.on("unhandledRejection", (err) => {
 });
 
 const main = async () => {
-  await mongoose.connect(appConfig.database.dataBase_uri as string);
+  await mongoose.connect(appConfig.database.dataBase_uri as string, {});
   logger.info("MongoDB connected");
-  startConsumers();
   await seedAdmin();
+
+  await startConsumers();
   // Wait up to 15 minutes for request to finish uploading //
   server.setTimeout(15 * 60 * 1000);
   //------------------------//
