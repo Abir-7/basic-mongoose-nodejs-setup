@@ -21,14 +21,14 @@ const superUserProfile = {
 };
 
 const seedAdmin = async (): Promise<void> => {
+  const isExistSuperAdmin = await User.findOne({
+    role: userRoles.ADMIN,
+  });
+
   const session = await mongoose.startSession();
   session.startTransaction();
   superUser.password = await getHashedPassword(superUser.password as string);
   try {
-    const isExistSuperAdmin = await User.findOne({
-      role: userRoles.ADMIN,
-    }).session(session);
-
     if (!isExistSuperAdmin) {
       const data = await User.create([superUser], { session });
       await UserProfile.create([{ ...superUserProfile, user: data[0]._id }], {
