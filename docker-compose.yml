@@ -16,7 +16,8 @@ services:
   basic-node-express:
     build: .
     depends_on:
-      - basic-node-rabbitmq
+      basic-node-rabbitmq:
+       condition: service_healthy
     env_file:
       - .env
     ports:
