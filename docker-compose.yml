@@ -5,8 +5,8 @@ services:
     image: rabbitmq:3-management
     container_name: basic-node-rabbitmq
     ports:
-      - "5673:5672"  # Changed left port to avoid conflict with old project
-      - "15673:15672" # Changed left port to avoid conflict with old project
+      - "5675:5672"  # Changed left port to avoid conflict with old project
+      - "15675:15672" # Changed left port to avoid conflict with old project
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
@@ -15,8 +15,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - mongo-cluster
 
   basic-node-express:
     build: .
@@ -30,10 +28,6 @@ services:
     volumes:
       - .:/app
     command: npm run dev
-    networks:
-      - mongo-cluster
 
-networks:
-  mongo-cluster:
-    external: true
+
 

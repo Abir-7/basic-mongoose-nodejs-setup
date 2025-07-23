@@ -10,6 +10,7 @@ import compression from "compression";
 import { limiter } from "./app/utils/serverTools/rateLimite";
 import helmet from "helmet";
 import morgan from "morgan";
+import { StripeController } from "./app/modules/stripe&payment/stripe/stripe.controller";
 const app = express();
 
 const corsOption = {
@@ -23,6 +24,13 @@ app.use(morgan("combined"));
 app.use(compression());
 app.use(cors(corsOption));
 app.use(cookieParser());
+
+app.use(
+  "/api/stripe/webhook",
+  express.raw({ type: "application/json" }),
+  StripeController.stripeWebhook
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(limiter);

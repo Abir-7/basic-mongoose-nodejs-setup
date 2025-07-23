@@ -9,15 +9,28 @@ const userSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true, select: false },
   role: { type: String, enum: userRole, default: "USER" },
+
   authentication: {
     expDate: { type: Date, default: null },
     otp: { type: Number, default: null },
     token: { type: String, default: null },
   },
+
   isVerified: { type: Boolean, default: false },
   needToResetPass: { type: Boolean, default: false },
-});
 
+  subscription: {
+    stripeCustomerId: { type: String },
+    lastPaymentHistoryId: {
+      type: Schema.Types.ObjectId,
+      ref: "PaymentHistory",
+    },
+    isCancelled: { type: Boolean, default: false },
+    activeSubscriptionId: { type: String, default: null },
+    lastPaymentDate: { type: Date, default: null },
+    isPaymentFailed: { type: Boolean, default: false },
+  },
+});
 userSchema.methods.comparePassword = async function (enteredPassword: string) {
   try {
     return await bcrypt.compare(enteredPassword, this.password);
