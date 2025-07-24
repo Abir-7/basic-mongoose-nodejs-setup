@@ -1,20 +1,21 @@
 import { model, Schema } from "mongoose";
 import { IPaymentHistory } from "./payment.interface";
 
-const paymentHistorySchema = new Schema<IPaymentHistory>({
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  subscriptionId: {
-    type: Schema.Types.ObjectId,
-    ref: "SubscriptionPlan",
-    required: true,
+const PaymentHistorySchema = new Schema<IPaymentHistory>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    subscriptionId: { type: String }, // Stripe subscription ID (optional)
+    invoiceId: { type: String, required: true },
+    amountPaid: { type: Number, required: true }, // in cents
+    currency: { type: String, default: "usd" },
+    paymentStatus: { type: String, enum: ["paid", "failed"], required: true },
+    paidAt: { type: Date },
+    receiptUrl: { type: String },
   },
-  stripePaymentIntentId: { type: String, required: true },
-  amount: { type: Number, required: true }, // cents
-  currency: { type: String, required: true },
-  paidAt: { type: Date, required: true },
-});
+  { timestamps: true }
+);
 
 export const PaymentHistory = model<IPaymentHistory>(
   "PaymentHistory",
-  paymentHistorySchema
+  PaymentHistorySchema
 );
