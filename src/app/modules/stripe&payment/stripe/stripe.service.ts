@@ -99,7 +99,7 @@ const createCheckoutSession = async (
   if (!stripeCustomerId) {
     const customer = await stripe.customers.create({
       email: user.email,
-      metadata: { userId: user._id as string },
+      metadata: { userId: String(user._id) },
     });
     stripeCustomerId = customer.id;
 
@@ -114,8 +114,11 @@ const createCheckoutSession = async (
     payment_method_types: ["card"],
     customer: stripeCustomerId,
     line_items: [{ price: plan.stripePriceId, quantity: 1 }],
-    success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+    success_url: "http://157.245.9.24:5001/",
+    cancel_url: "http://157.245.9.24:5001/",
+    metadata: {
+      subscriptionPackageId,
+    },
   });
 
   return session.url!;
@@ -179,19 +182,26 @@ const stripeWebhook = async (rawBody: Buffer, sig: string) => {
   const data = event.data.object;
 
   switch (event.type) {
-    case "invoice.payment_succeeded": {
+    case "invoice.paid": {
       const invoice = data as Stripe.Invoice;
+
+      const subscription = await stripe.subscriptions.retrieve(
+        (invoice as any).subscription as string
+      );
+
+      const subscriptionPackageId = subscription.metadata.subscriptionPackageId;
 
       // Find user by Stripe customer ID
       const user = await User.findOne({
         "subscription.stripeCustomerId": invoice.customer,
       });
+      console.log(user);
       if (!user || !user.subscription) break;
 
       // Save payment history
       const payment = new PaymentHistory({
         userId: user._id,
-        subscriptionId: user.subscription.packageId,
+        subscriptionId: subscriptionPackageId,
         stripePaymentIntentId: (invoice as any).payment_intent as string,
         amount: invoice.amount_paid,
         currency: invoice.currency,
