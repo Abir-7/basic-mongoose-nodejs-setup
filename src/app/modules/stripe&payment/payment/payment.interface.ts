@@ -1,22 +1,10 @@
-import { IBaseUser } from "../../users/user/user.interface";
+import { Types } from "mongoose";
 
 export interface IPaymentHistory {
-  _id?: string;
-  userId: IBaseUser;
-  subscriptionId: string;
-  invoiceId: string;
-
-  amountPaid: number;
+  userId: Types.ObjectId;
+  subscriptionId: Types.ObjectId;
+  stripePaymentIntentId: string;
+  amount: number;
   currency: string;
-
-  status: "paid" | "unpaid" | "failed";
   paidAt: Date;
-
-  receiptUrl?: string;
-  billingReason?: string;
-  periodStart?: Date;
-  periodEnd?: Date;
-
-  createdAt?: Date;
-  updatedAt?: Date;
 }

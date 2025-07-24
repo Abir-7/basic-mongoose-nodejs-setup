@@ -1,6 +1,5 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import { TUserRole } from "../../../interface/auth.interface";
-import { IPaymentHistory } from "../../stripe&payment/payment/payment.interface";
 
 export interface IBaseUser {
   email: string;
@@ -13,14 +12,16 @@ export interface IBaseUser {
   };
   isVerified: boolean;
   needToResetPass: boolean;
-  subscription: {
-    stripeCustomerId: string;
-    lastPaymentHistoryId?: IPaymentHistory; // ✅ only store last payment ID
-    isCancelled?: boolean;
-    activeSubscriptionId?: string;
-    lastPaymentDate?: Date;
-    isPaymentFailed?: boolean;
-  };
+  subscription: IUserSubscription;
+}
+
+interface IUserSubscription {
+  stripeCustomerId: string;
+  activeSubscriptionId: string;
+  packageId: Types.ObjectId; // subscription plan id ref
+  priceId: string; // current price id
+  isCancelled: boolean;
+  currentPeriodEnd: Date;
 }
 
 export interface IUser extends IBaseUser, Document {

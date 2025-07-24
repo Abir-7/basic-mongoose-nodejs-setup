@@ -2,9 +2,10 @@ import status from "http-status";
 import catchAsync from "../../../utils/serverTools/catchAsync";
 import sendResponse from "../../../utils/serverTools/sendResponse";
 import { StripeService } from "./stripe.service";
+import logger from "../../../utils/serverTools/logger";
 
 const createSubscriptionPlan = catchAsync(async (req, res) => {
-  const result = StripeService.createSubscription(req.body);
+  const result = await StripeService.createSubscription(req.body);
 
   sendResponse(res, {
     success: true,
@@ -15,7 +16,10 @@ const createSubscriptionPlan = catchAsync(async (req, res) => {
 });
 
 const updateSubscriptionPlan = catchAsync(async (req, res) => {
-  const result = StripeService.updateSubscriptionPlan(req.params.sId, req.body);
+  const result = await StripeService.updateSubscriptionPlan(
+    req.params.sId,
+    req.body
+  );
 
   sendResponse(res, {
     success: true,
@@ -26,7 +30,7 @@ const updateSubscriptionPlan = catchAsync(async (req, res) => {
 });
 
 const deleteSubscriptionPlan = catchAsync(async (req, res) => {
-  const result = StripeService.deleteSubscriptionPlan(req.params.sId);
+  const result = await StripeService.deleteSubscriptionPlan(req.params.sId);
 
   sendResponse(res, {
     success: true,
@@ -35,10 +39,11 @@ const deleteSubscriptionPlan = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const createCheckoutSession = catchAsync(async (req, res) => {
-  const result = StripeService.createCheckoutSession(
+  const result = await StripeService.createCheckoutSession(
     req.user.userId,
-    req.body.priceId
+    req.body.subscriptionPackageId
   );
 
   sendResponse(res, {
@@ -52,7 +57,7 @@ const createCheckoutSession = catchAsync(async (req, res) => {
 const stripeWebhook = catchAsync(async (req, res) => {
   const sig = req.headers["stripe-signature"] as string;
   const rawBody = req.body;
-
+  logger.info("hit");
   const result = await StripeService.stripeWebhook(rawBody, sig);
   sendResponse(res, {
     success: true,
@@ -61,6 +66,7 @@ const stripeWebhook = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const cancelUserSubscription = catchAsync(async (req, res) => {
   const result = await StripeService.cancelUserSubscription(req.params.uId);
   sendResponse(res, {

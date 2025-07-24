@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { model, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 import { IUser } from "./user.interface";
 import { userRole } from "../../../interface/auth.interface";
 
@@ -20,15 +20,16 @@ const userSchema = new Schema<IUser>({
   needToResetPass: { type: Boolean, default: false },
 
   subscription: {
-    stripeCustomerId: { type: String },
-    lastPaymentHistoryId: {
+    stripeCustomerId: { type: String, required: true },
+    activeSubscriptionId: { type: String, required: true },
+    packageId: {
       type: Schema.Types.ObjectId,
-      ref: "PaymentHistory",
+      ref: "SubscriptionPlan",
+      required: true,
     },
+    priceId: { type: String, required: true },
     isCancelled: { type: Boolean, default: false },
-    activeSubscriptionId: { type: String, default: null },
-    lastPaymentDate: { type: Date, default: null },
-    isPaymentFailed: { type: Boolean, default: false },
+    currentPeriodEnd: { type: Date, required: true },
   },
 });
 userSchema.methods.comparePassword = async function (enteredPassword: string) {

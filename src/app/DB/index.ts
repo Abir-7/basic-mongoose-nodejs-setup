@@ -25,28 +25,29 @@ const seedAdmin = async (): Promise<void> => {
     role: userRoles.ADMIN,
   });
 
+  if (isExistSuperAdmin) {
+    logger.info("Admin already created");
+    return;
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
-  superUser.password = await getHashedPassword(superUser.password as string);
+
   try {
-    if (!isExistSuperAdmin) {
-      const data = await User.create([superUser], { session });
-      await UserProfile.create([{ ...superUserProfile, user: data[0]._id }], {
-        session,
-      });
-      logger.info("Admin Created");
-    } else {
-      logger.info("Admin already created");
-    }
+    superUser.password = await getHashedPassword(superUser.password as string);
+
+    const data = await User.create([superUser], { session });
+    await UserProfile.create([{ ...superUserProfile, user: data[0]._id }], {
+      session,
+    });
 
     await session.commitTransaction();
-    session.endSession();
+    logger.info("Admin Created");
   } catch (error: any) {
-    logger.error(`Faield to create Admin.${error} `);
-
     await session.abortTransaction();
+    logger.error(`Failed to create Admin. ${error} `);
+  } finally {
     session.endSession();
-    //throw error;
   }
 };
 
