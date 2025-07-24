@@ -1,4 +1,4 @@
-import { Document, Types } from "mongoose";
+import { Document } from "mongoose";
 import { TUserRole } from "../../../interface/auth.interface";
 
 export interface IBaseUser {
@@ -12,16 +12,6 @@ export interface IBaseUser {
   };
   isVerified: boolean;
   needToResetPass: boolean;
-  subscription: IUserSubscription;
-}
-
-interface IUserSubscription {
-  stripeCustomerId: string;
-  activeSubscriptionId: string;
-  packageId: Types.ObjectId; // subscription plan id ref
-  priceId: string; // current price id
-  isCancelled: boolean;
-  currentPeriodEnd: Date;
 }
 
 export interface IUser extends IBaseUser, Document {

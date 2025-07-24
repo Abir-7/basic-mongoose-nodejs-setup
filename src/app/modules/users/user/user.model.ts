@@ -18,18 +18,6 @@ const userSchema = new Schema<IUser>({
 
   isVerified: { type: Boolean, default: false },
   needToResetPass: { type: Boolean, default: false },
-
-  subscription: {
-    stripeCustomerId: { type: String },
-    activeSubscriptionId: { type: String },
-    packageId: {
-      type: Schema.Types.ObjectId,
-      ref: "SubscriptionPlan",
-    },
-    priceId: { type: String },
-    isCancelled: { type: Boolean },
-    currentPeriodEnd: { type: Date },
-  },
 });
 userSchema.methods.comparePassword = async function (enteredPassword: string) {
   try {
