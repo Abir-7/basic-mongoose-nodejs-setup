@@ -6,12 +6,14 @@ import {
 const userSubscriptionSchema = new Schema<IUserSubscription>(
   {
     userId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
-    subscriptionId: { type: String, required: true },
+    stripeCustomerId: { type: String },
+    subscriptionId: { type: String },
     planId: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: "SubscriptionPlan",
     },
+
     status: {
       type: String,
       enum: Object.values(SubscriptionStatus),

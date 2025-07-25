@@ -41,10 +41,10 @@ const deleteSubscriptionPlan = catchAsync(async (req, res) => {
 });
 
 const createCheckoutSession = catchAsync(async (req, res) => {
-  const result = await StripeService.createCheckoutSession(
-    req.user.userId,
-    req.body.subscriptionPackageId
-  );
+  const result = await StripeService.createCheckoutSession({
+    userId: req.user.userId,
+    planId: req.body.subscriptionPackageId,
+  });
 
   sendResponse(res, {
     success: true,
@@ -57,6 +57,7 @@ const createCheckoutSession = catchAsync(async (req, res) => {
 const stripeWebhook = catchAsync(async (req, res) => {
   const sig = req.headers["stripe-signature"] as string;
   const rawBody = req.body;
+
   logger.info("hit");
   const result = await StripeService.stripeWebhook(rawBody, sig);
   sendResponse(res, {
@@ -68,7 +69,7 @@ const stripeWebhook = catchAsync(async (req, res) => {
 });
 
 const cancelUserSubscription = catchAsync(async (req, res) => {
-  const result = await StripeService.cancelUserSubscription(req.params.uId);
+  const result = await StripeService.cancelUserSubscription(req.user.userId);
   sendResponse(res, {
     success: true,
     statusCode: status.OK,

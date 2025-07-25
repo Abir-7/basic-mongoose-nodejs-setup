@@ -24,7 +24,7 @@ app.use(morgan("combined"));
 app.use(compression());
 app.use(cors(corsOption));
 app.use(cookieParser());
-
+app.set("trust proxy", true);
 app.use(
   "/api/stripe/webhook",
   express.raw({ type: "application/json" }),

@@ -4,7 +4,6 @@ import { IPaymentHistory } from "./payment.interface";
 const PaymentHistorySchema = new Schema<IPaymentHistory>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    subscriptionId: { type: String }, // Stripe subscription ID (optional)
     invoiceId: { type: String, required: true },
     amountPaid: { type: Number, required: true }, // in cents
     currency: { type: String, default: "usd" },
