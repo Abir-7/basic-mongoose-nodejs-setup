@@ -1,32 +1,63 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import mongoose, { model, Schema } from "mongoose";
+
+import { model, Schema } from "mongoose";
 import { IUser } from "./user.interface";
-import { userRole } from "../../../interface/auth.interface";
 
 import bcrypt from "bcryptjs";
-const userSchema = new Schema<IUser>({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true, select: false },
-  role: { type: String, enum: userRole, default: "USER" },
-
-  authentication: {
-    expDate: { type: Date, default: null },
-    otp: { type: Number, default: null },
-    token: { type: String, default: null },
+import { user_role } from "../../../interface/auth.interface";
+const user_schema = new Schema<IUser>(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    role: {
+      type: String,
+      required: true,
+      enum: user_role, // adjust roles according to TUserRole
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    authentication: {
+      exp_date: {
+        type: Date,
+        required: true,
+      },
+      otp: {
+        type: Number,
+        required: true,
+      },
+      token: {
+        type: String,
+        required: true,
+      },
+    },
+    is_verified: {
+      type: Boolean,
+      default: false,
+    },
+    need_to_reset_password: {
+      type: Boolean,
+      default: false,
+    },
   },
-
-  isVerified: { type: Boolean, default: false },
-  needToResetPass: { type: Boolean, default: false },
-});
-userSchema.methods.comparePassword = async function (enteredPassword: string) {
+  { timestamps: true }
+);
+user_schema.methods.comparePassword = async function (
+  entered_password: string
+) {
   try {
-    return await bcrypt.compare(enteredPassword, this.password);
+    return await bcrypt.compare(entered_password, this.password);
   } catch (error) {
     throw new Error("Error comparing password");
   }
 };
 
-const User = model<IUser>("User", userSchema);
+const User = model<IUser>("User", user_schema);
 
 export default User;

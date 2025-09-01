@@ -4,8 +4,9 @@ import server from "./app";
 import { appConfig } from "./app/config";
 import mongoose from "mongoose";
 import logger from "./app/utils/serverTools/logger";
-import seedAdmin from "./app/DB";
-import { startConsumers } from "./app/rabbitMq/worker";
+
+import { start_consumers } from "./app/lib/rabbitMq/worker";
+import seed_admin from "./app/DB";
 
 process.on("uncaughtException", (err) => {
   logger.error("Uncaught exception:", err);
@@ -19,11 +20,11 @@ process.on("unhandledRejection", (err) => {
 });
 
 const main = async () => {
-  await mongoose.connect(appConfig.database.dataBase_uri as string, {});
+  await mongoose.connect(appConfig.database.uri as string, {});
   logger.info("MongoDB connected");
-  await seedAdmin();
+  await seed_admin();
 
-  startConsumers();
+  start_consumers();
   // Wait up to 15 minutes for request to finish uploading //
   server.setTimeout(15 * 60 * 1000);
   //------------------------//

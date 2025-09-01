@@ -1,31 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from "mongoose";
 import { appConfig } from "../config";
-import { userRoles } from "../interface/auth.interface";
 
 import User from "../modules/users/user/user.model";
 import logger from "../utils/serverTools/logger";
-import getHashedPassword from "../utils/helper/getHashedPassword";
-import { UserProfile } from "../modules/users/userProfile/userProfile.model";
+import get_hashed_password from "../utils/helper/get_hashed_password";
+import { UserProfile } from "../modules/users/user_profile/user_profile.model";
+import { user_roles } from "../interface/auth.interface";
 
-const superUser = {
-  role: userRoles.ADMIN,
+const super_user = {
+  role: user_roles.ADMIN,
   email: appConfig.admin.email,
   password: appConfig.admin.password,
-  isVerified: true,
+  is_verified: true,
 };
 
-const superUserProfile = {
-  fullName: "Admin-1",
+const super_user_profile = {
+  full_name: "Admin-1",
   email: appConfig.admin.email,
 };
 
-const seedAdmin = async (): Promise<void> => {
-  const isExistSuperAdmin = await User.findOne({
-    role: userRoles.ADMIN,
+const seed_admin = async (): Promise<void> => {
+  const is_exist_super_admin = await User.findOne({
+    role: user_roles.ADMIN,
   });
 
-  if (isExistSuperAdmin) {
+  if (is_exist_super_admin) {
     logger.info("Admin already created");
     return;
   }
@@ -34,10 +34,12 @@ const seedAdmin = async (): Promise<void> => {
   session.startTransaction();
 
   try {
-    superUser.password = await getHashedPassword(superUser.password as string);
+    super_user.password = await get_hashed_password(
+      super_user.password as string
+    );
 
-    const data = await User.create([superUser], { session });
-    await UserProfile.create([{ ...superUserProfile, user: data[0]._id }], {
+    const data = await User.create([super_user], { session });
+    await UserProfile.create([{ ...super_user_profile, user: data[0]._id }], {
       session,
     });
 
@@ -51,4 +53,4 @@ const seedAdmin = async (): Promise<void> => {
   }
 };
 
-export default seedAdmin;
+export default seed_admin;

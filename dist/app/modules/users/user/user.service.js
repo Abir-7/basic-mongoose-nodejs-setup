@@ -11,11 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
-const userProfile_model_1 = require("../userProfile/userProfile.model");
-const getMyData = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield userProfile_model_1.UserProfile.findOne({ user: userId }).populate("user");
+const user_profile_model_1 = require("../user_profile/user_profile.model");
+const get_my_data = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_profile_model_1.UserProfile.findOne({ user: userId }).populate("user");
     return user;
 });
 exports.UserService = {
-    getMyData,
+    get_my_data,
 };

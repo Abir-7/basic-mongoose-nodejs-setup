@@ -3,22 +3,22 @@ import status from "http-status";
 import AppError from "../../errors/AppError";
 import User from "../users/user/user.model";
 
-import { jsonWebToken } from "../../utils/jwt/jwt";
+import { JsonWebToken } from "../../utils/jwt/jwt";
 
-import { UserProfile } from "../users/userProfile/userProfile.model";
-import getExpiryTime from "../../utils/helper/getExpiryTime";
-import getOtp from "../../utils/helper/getOtp";
-import { sendEmail } from "../../utils/sendEmail";
-import getHashedPassword from "../../utils/helper/getHashedPassword";
+import { UserProfile } from "../users/user_profile/user_profile.model";
+import get_expiry_time from "../../utils/helper/get_expiry_time";
+import get_otp from "../../utils/helper/get_otp";
+import { send_email } from "../../utils/send_email";
+import get_hashed_password from "../../utils/helper/get_hashed_password";
 import { appConfig } from "../../config";
 import { IUser } from "../users/user/user.interface";
 import mongoose from "mongoose";
-import { isTimeExpired } from "../../utils/helper/isTimeExpire";
-import { publishJob } from "../../rabbitMq/publisher";
+import { is_time_expired } from "../../utils/helper/is_time_expire";
+import { publishJob } from "../../lib/rabbitMq/publisher";
 
-const createUser = async (data: {
+const create_user = async (data: {
   email: string;
-  fullName: string;
+  full_name: string;
   password: string;
 }): Promise<Partial<IUser>> => {
   const session = await mongoose.startSession();
@@ -27,25 +27,25 @@ const createUser = async (data: {
   try {
     const isExist = await User.findOne({ email: data.email }).session(session);
 
-    if (isExist && isExist.isVerified === true) {
+    if (isExist && isExist.is_verified === true) {
       throw new AppError(status.BAD_REQUEST, "User already exist");
     }
 
-    if (isExist && isExist.isVerified === false) {
+    if (isExist && isExist.is_verified === false) {
       await User.findOneAndDelete({ _id: isExist._id }).session(session);
       await UserProfile.findOneAndDelete({ user: isExist._id }).session(
         session
       );
     }
 
-    const hashedPassword = await getHashedPassword(data.password);
-    const otp = getOtp(4);
-    const expDate = getExpiryTime(10);
+    const hashedPassword = await get_hashed_password(data.password);
+    const otp = get_otp(4);
+    const expDate = get_expiry_time(10);
 
     const userData = {
       email: data.email,
       password: hashedPassword,
-      authentication: { otp, expDate },
+      authentication: { otp, exp_date: expDate },
     };
 
     const createdUser = await User.create([{ ...userData, role: "USER" }], {
@@ -53,8 +53,7 @@ const createUser = async (data: {
     });
 
     const userProfileData = {
-      fullName: data.fullName,
-      email: createdUser[0].email,
+      full_name: data.full_name,
       user: createdUser[0]._id,
     };
     await UserProfile.create([userProfileData], { session });
@@ -70,7 +69,7 @@ const createUser = async (data: {
 
     return {
       email: createdUser[0].email,
-      isVerified: createdUser[0].isVerified,
+      is_verified: createdUser[0].is_verified,
     };
   } catch (error) {
     await session.abortTransaction();
@@ -79,10 +78,15 @@ const createUser = async (data: {
   }
 };
 
-const userLogin = async (loginData: {
+const user_login = async (loginData: {
   email: string;
   password: string;
-}): Promise<{ accessToken: string; userData: any; refreshToken: string }> => {
+}): Promise<{
+  access_token: string;
+  user_id: string;
+  email: string;
+  refresh_token: string;
+}> => {
   const userData = await User.findOne({ email: loginData.email }).select(
     "+password"
   );
@@ -90,7 +94,7 @@ const userLogin = async (loginData: {
     throw new AppError(status.BAD_REQUEST, "Please check your email");
   }
 
-  if (userData.isVerified === false) {
+  if (userData.is_verified === false) {
     throw new AppError(status.BAD_REQUEST, "Please verify your email.");
   }
 
@@ -101,41 +105,39 @@ const userLogin = async (loginData: {
   }
 
   const jwtPayload = {
-    userEmail: userData.email,
-    userId: userData._id,
-    userRole: userData.role,
+    user_email: userData.email,
+    user_id: userData._id,
+    user_role: userData.role,
   };
 
-  const accessToken = jsonWebToken.generateToken(
+  const accessToken = JsonWebToken.generate_token(
     jwtPayload,
     appConfig.jwt.jwt_access_secret as string,
-    appConfig.jwt.jwt_access_exprire
+    appConfig.jwt.jwt_access_expire
   );
 
-  const refreshToken = jsonWebToken.generateToken(
+  const refreshToken = JsonWebToken.generate_token(
     jwtPayload,
     appConfig.jwt.jwt_refresh_secret as string,
-    appConfig.jwt.jwt_refresh_exprire
+    appConfig.jwt.jwt_refresh_expire
   );
 
   return {
-    accessToken,
-    refreshToken,
-    userData: {
-      ...userData.toObject(),
-      password: null,
-    },
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    user_id: userData._id as string,
+    email: userData.email,
   };
 };
 
-const verifyUser = async (
+const verify_user = async (
   email: string,
   otp: number
 ): Promise<{
-  userId: string | undefined;
+  user_id: string | undefined;
   email: string | undefined;
-  isVerified: boolean | undefined;
-  needToResetPass: boolean | undefined;
+  is_verified: boolean | undefined;
+  need_to_reset_password: boolean | undefined;
   token: string | null;
 }> => {
   if (!otp) {
@@ -146,9 +148,9 @@ const verifyUser = async (
     throw new AppError(status.BAD_REQUEST, "User not found");
   }
 
-  const expirationDate = user.authentication.expDate;
+  const expirationDate = user.authentication.exp_date;
 
-  if (isTimeExpired(expirationDate)) {
+  if (is_time_expired(expirationDate)) {
     throw new AppError(status.BAD_REQUEST, "Code time expired.");
   }
 
@@ -158,21 +160,21 @@ const verifyUser = async (
 
   let updatedUser;
   let token = null;
-  if (user.isVerified) {
-    token = jsonWebToken.generateToken(
+  if (user.is_verified) {
+    token = JsonWebToken.generate_token(
       { userEmail: user.email },
       appConfig.jwt.jwt_access_secret as string,
       "10m"
     );
 
-    const expDate = getExpiryTime(10);
+    const exp_date = get_expiry_time(10);
 
     updatedUser = await User.findOneAndUpdate(
       { email: user.email },
       {
         "authentication.otp": null,
-        "authentication.expDate": expDate,
-        needToResetPass: true,
+        "authentication.exp_date": exp_date,
+        need_to_reset_password: true,
         "authentication.token": token,
       },
       { new: true }
@@ -182,23 +184,23 @@ const verifyUser = async (
       { email: user.email },
       {
         "authentication.otp": null,
-        "authentication.expDate": null,
-        isVerified: true,
+        "authentication.exp_date": null,
+        is_verified: true,
       },
       { new: true }
     );
   }
 
   return {
-    userId: updatedUser?._id as string,
+    user_id: updatedUser?._id as string,
     email: updatedUser?.email,
-    isVerified: updatedUser?.isVerified,
-    needToResetPass: updatedUser?.needToResetPass,
+    is_verified: updatedUser?.is_verified,
+    need_to_reset_password: updatedUser?.need_to_reset_password,
     token: token,
   };
 };
 
-const forgotPasswordRequest = async (
+const forgot_password_request = async (
   email: string
 ): Promise<{ email: string }> => {
   const user = await User.findOne({ email });
@@ -207,21 +209,21 @@ const forgotPasswordRequest = async (
     throw new AppError(status.BAD_REQUEST, "Email not found.");
   }
 
-  const otp = getOtp(4);
-  const expDate = getExpiryTime(10);
+  const otp = get_otp(4);
+  const exp_date = get_expiry_time(10);
 
   const data = {
     otp: otp,
-    expDate: expDate,
-    needToResetPass: false,
+    exp_date: exp_date,
+    need_to_reset_password: false,
     token: null,
   };
 
-  await sendEmail(
-    user.email,
-    "Reset Password Verification Code",
-    `Your code is: ${otp}`
-  );
+  await publishJob("emailQueue", {
+    to: email,
+    subject: "Reset Password Verification Code",
+    body: otp.toString(),
+  });
 
   await User.findOneAndUpdate(
     { email },
@@ -232,14 +234,14 @@ const forgotPasswordRequest = async (
   return { email: user.email };
 };
 
-const resetPassword = async (
+const reset_password = async (
   token: string,
-  userData: {
+  user_data: {
     new_password: string;
     confirm_password: string;
   }
-): Promise<{ email: string }> => {
-  const { new_password, confirm_password } = userData;
+): Promise<{ email: string; user_id: string }> => {
+  const { new_password, confirm_password } = user_data;
 
   if (!token) {
     throw new AppError(
@@ -254,7 +256,7 @@ const resetPassword = async (
   }
 
   const currentDate = new Date();
-  const expirationDate = new Date(user.authentication.expDate);
+  const expirationDate = new Date(user.authentication.exp_date);
 
   if (currentDate > expirationDate) {
     throw new AppError(status.BAD_REQUEST, "Token expired.");
@@ -267,19 +269,19 @@ const resetPassword = async (
     );
   }
 
-  const decode = jsonWebToken.verifyJwt(
+  const decode = JsonWebToken.verify_jwt(
     token,
     appConfig.jwt.jwt_access_secret as string
   );
 
-  const hassedPassword = await getHashedPassword(new_password);
+  const hassedPassword = await get_hashed_password(new_password);
 
   const updateData = await User.findOneAndUpdate(
-    { email: decode.userEmail },
+    { email: decode.user_email },
     {
       password: hassedPassword,
-      authentication: { otp: null, token: null, expDate: null },
-      needToResetPass: false,
+      authentication: { otp: null, token: null, exp_date: null },
+      need_to_reset_password: false,
     },
     { new: true }
   );
@@ -289,33 +291,33 @@ const resetPassword = async (
       "Failed to reset password. Try again."
     );
   }
-  return { email: updateData?.email as string };
+  return { email: updateData?.email as string, user_id: user._id as string };
 };
 
-const getNewAccessToken = async (
+const get_new_access_token = async (
   refreshToken: string
 ): Promise<{ accessToken: string }> => {
   if (!refreshToken) {
     throw new AppError(status.UNAUTHORIZED, "Refresh token not found.");
   }
-  const decode = jsonWebToken.verifyJwt(
+  const decode = JsonWebToken.verify_jwt(
     refreshToken,
     appConfig.jwt.jwt_refresh_secret as string
   );
 
-  const { userEmail, userId, userRole } = decode;
+  const { user_email, user_id, user_role } = decode;
 
-  if (userEmail && userId && userRole) {
+  if (user_email && user_id && user_role) {
     const jwtPayload = {
-      userEmail: userEmail,
-      userId: userId,
-      userRole: userRole,
+      user_email: user_email,
+      user_id: user_id,
+      user_role: user_role,
     };
 
-    const accessToken = jsonWebToken.generateToken(
+    const accessToken = JsonWebToken.generate_token(
       jwtPayload,
       appConfig.jwt.jwt_access_secret as string,
-      appConfig.jwt.jwt_access_exprire
+      appConfig.jwt.jwt_access_expire
     );
     return { accessToken };
   } else {
@@ -323,7 +325,7 @@ const getNewAccessToken = async (
   }
 };
 
-const updatePassword = async (
+const update_password = async (
   userId: string,
   passData: {
     new_password: string;
@@ -351,7 +353,7 @@ const updatePassword = async (
     );
   }
 
-  const hassedPassword = await getHashedPassword(new_password);
+  const hassedPassword = await get_hashed_password(new_password);
 
   if (!hassedPassword) {
     throw new AppError(
@@ -366,14 +368,14 @@ const updatePassword = async (
   return { user: user.email, message: "Password successfully updated." };
 };
 
-const reSendOtp = async (userEmail: string): Promise<{ message: string }> => {
+const re_send_otp = async (userEmail: string): Promise<{ message: string }> => {
   const userData = await User.findOne({ email: userEmail });
 
   if (!userData?.authentication.otp) {
     throw new AppError(500, "Don't find any expired code");
   }
 
-  const OTP = getOtp(4);
+  const OTP = get_otp(4);
 
   const updateUser = await User.findOneAndUpdate(
     { email: userEmail },
@@ -390,16 +392,16 @@ const reSendOtp = async (userEmail: string): Promise<{ message: string }> => {
     throw new AppError(500, "Failed to Send. Try Again!");
   }
 
-  await sendEmail(userEmail, "Verification Code", `CODE: ${OTP}`);
+  await send_email(userEmail, "Verification Code", `CODE: ${OTP}`);
   return { message: "Verification code send." };
 };
 export const AuthService = {
-  createUser,
-  userLogin,
-  verifyUser,
-  forgotPasswordRequest,
-  resetPassword,
-  getNewAccessToken,
-  updatePassword,
-  reSendOtp,
+  create_user,
+  user_login,
+  verify_user,
+  forgot_password_request,
+  reset_password,
+  get_new_access_token,
+  update_password,
+  re_send_otp,
 };

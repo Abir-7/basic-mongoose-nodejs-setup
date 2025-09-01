@@ -15,88 +15,88 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const http_status_1 = __importDefault(require("http-status"));
-const catchAsync_1 = __importDefault(require("../../utils/serverTools/catchAsync"));
-const sendResponse_1 = __importDefault(require("../../utils/serverTools/sendResponse"));
 const auth_service_1 = require("./auth.service");
 const config_1 = require("../../config");
-const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const catch_async_1 = __importDefault(require("../../utils/serverTools/catch_async"));
+const send_response_1 = __importDefault(require("../../utils/serverTools/send_response"));
+const create_user = (0, catch_async_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = req.body;
-    const result = yield auth_service_1.AuthService.createUser(userData);
-    (0, sendResponse_1.default)(res, {
+    const result = yield auth_service_1.AuthService.create_user(userData);
+    (0, send_response_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
         message: "User successfully created.Check your email for code.",
         data: result,
     });
 }));
-const userLogin = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield auth_service_1.AuthService.userLogin(req.body);
-    res.cookie("refreshToken", result.refreshToken, {
+const user_login = (0, catch_async_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield auth_service_1.AuthService.user_login(req.body);
+    res.cookie("refreshToken", result.refresh_token, {
         secure: config_1.appConfig.server.node_env === "production",
         httpOnly: true,
     });
-    (0, sendResponse_1.default)(res, {
+    (0, send_response_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
         message: "User login successfull",
         data: result,
     });
 }));
-const verifyUser = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const verify_user = (0, catch_async_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, otp } = req.body;
-    const result = yield auth_service_1.AuthService.verifyUser(email, Number(otp));
-    (0, sendResponse_1.default)(res, {
+    const result = yield auth_service_1.AuthService.verify_user(email, Number(otp));
+    (0, send_response_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
         message: "Email successfully verified.",
         data: result,
     });
 }));
-const forgotPasswordRequest = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const forgot_password_request = (0, catch_async_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
-    const result = yield auth_service_1.AuthService.forgotPasswordRequest(email);
-    (0, sendResponse_1.default)(res, {
+    const result = yield auth_service_1.AuthService.forgot_password_request(email);
+    (0, send_response_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
         message: "A verification code is sent to your email.",
         data: result,
     });
 }));
-const resetPassword = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const reset_password = (0, catch_async_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const tokenWithBearer = req.headers.authorization;
     const token = tokenWithBearer.split(" ")[1];
-    const result = yield auth_service_1.AuthService.resetPassword(token, req.body);
-    (0, sendResponse_1.default)(res, {
+    const result = yield auth_service_1.AuthService.reset_password(token, req.body);
+    (0, send_response_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
         message: "Password reset successfully",
         data: result,
     });
 }));
-const getNewAccessToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const get_new_access_token = (0, catch_async_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
-    const result = yield auth_service_1.AuthService.getNewAccessToken(refreshToken);
-    (0, sendResponse_1.default)(res, {
+    const result = yield auth_service_1.AuthService.get_new_access_token(refreshToken);
+    (0, send_response_1.default)(res, {
         data: result,
         success: true,
         statusCode: http_status_1.default.OK,
         message: "New access-token is created.",
     });
 }));
-const updatePassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.user;
-    const result = yield auth_service_1.AuthService.updatePassword(userId, req.body);
-    (0, sendResponse_1.default)(res, {
+const update_password = (0, catch_async_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user_id } = req.user;
+    const result = yield auth_service_1.AuthService.update_password(user_id, req.body);
+    (0, send_response_1.default)(res, {
         data: result,
         success: true,
         statusCode: http_status_1.default.OK,
         message: "Password successfully updated",
     });
 }));
-const reSendOtp = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const re_send_otp = (0, catch_async_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
-    const result = yield auth_service_1.AuthService.reSendOtp(email);
-    (0, sendResponse_1.default)(res, {
+    const result = yield auth_service_1.AuthService.re_send_otp(email);
+    (0, send_response_1.default)(res, {
         data: result,
         success: true,
         statusCode: http_status_1.default.OK,
@@ -104,12 +104,12 @@ const reSendOtp = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
     });
 }));
 exports.AuthController = {
-    createUser,
-    verifyUser,
-    forgotPasswordRequest,
-    resetPassword,
-    userLogin,
-    getNewAccessToken,
-    updatePassword,
-    reSendOtp,
+    create_user,
+    verify_user,
+    forgot_password_request,
+    reset_password,
+    user_login,
+    get_new_access_token,
+    update_password,
+    re_send_otp,
 };

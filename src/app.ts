@@ -2,15 +2,18 @@ import express from "express";
 import cors from "cors";
 import router from "./app/routes";
 import http from "http";
-import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
-import { noRouteFound } from "./app/utils/serverTools/noRouteFound";
+import { global_error_handler } from "./app/middleware/global_error_handler";
+
 import cookieParser from "cookie-parser";
 import path from "path";
 import compression from "compression";
-import { limiter } from "./app/utils/serverTools/rateLimite";
+
 import helmet from "helmet";
 import morgan from "morgan";
-import { StripeController } from "./app/modules/stripe&payment/stripe/stripe.controller";
+import { StripeController } from "./app/modules/stripe/stripe.controller";
+import { no_route_found } from "./app/utils/serverTools/no_route_found";
+import { limiter } from "./app/utils/serverTools/rate_limit";
+
 const app = express();
 
 const corsOption = {
@@ -43,8 +46,8 @@ app.get("/", (req, res) => {
 
 app.use(express.static(path.join(process.cwd(), "uploads")));
 
-app.use(globalErrorHandler);
-app.use(noRouteFound);
+app.use(global_error_handler);
+app.use(no_route_found);
 const server = http.createServer(app);
 
 export default server;

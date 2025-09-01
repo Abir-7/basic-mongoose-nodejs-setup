@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const zodCreateUserSchema = z.object({
+export const zodcreate_userSchema = z.object({
   body: z
     .object({
       fullName: z.string(),

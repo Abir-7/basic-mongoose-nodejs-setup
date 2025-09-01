@@ -5,15 +5,15 @@ import fs from "fs";
 import path from "path";
 
 const env = process.env.NODE_ENV || "development";
-const logDir = path.join(process.cwd(), "logs");
+const log_dir = path.join(process.cwd(), "logs");
 
 // Create logs directory if it doesn't exist
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir, { recursive: true });
+if (!fs.existsSync(log_dir)) {
+  fs.mkdirSync(log_dir, { recursive: true });
 }
 
-const dailyRotateFileTransport = new DailyRotateFile({
-  filename: path.join(logDir, "%DATE%-app.log"),
+const daily_rotate_file_transport = new DailyRotateFile({
+  filename: path.join(log_dir, "%DATE%-app.log"),
   datePattern: "YYYY-MM-DD",
   zippedArchive: true,
   maxSize: "20m",
@@ -22,27 +22,27 @@ const dailyRotateFileTransport = new DailyRotateFile({
   format: format.combine(format.timestamp(), format.json()),
 });
 
-const errorFilter = format((info) => (info.level === "error" ? info : false));
+const error_filter = format((info) => (info.level === "error" ? info : false));
 
-const exceptionHandlers = [
+const exception_handlers = [
   new DailyRotateFile({
-    filename: path.join(logDir, "%DATE%-exceptions.log"),
+    filename: path.join(log_dir, "%DATE%-exceptions.log"),
     datePattern: "YYYY-MM-DD",
     zippedArchive: true,
     maxSize: "20m",
     maxFiles: "30d",
-    format: format.combine(errorFilter(), format.timestamp(), format.json()),
+    format: format.combine(error_filter(), format.timestamp(), format.json()),
   }),
 ];
 
-const rejectionHandlers = [
+const rejection_handlers = [
   new DailyRotateFile({
-    filename: path.join(logDir, "%DATE%-rejections.log"),
+    filename: path.join(log_dir, "%DATE%-rejections.log"),
     datePattern: "YYYY-MM-DD",
     zippedArchive: true,
     maxSize: "20m",
     maxFiles: "30d",
-    format: format.combine(errorFilter(), format.timestamp(), format.json()),
+    format: format.combine(error_filter(), format.timestamp(), format.json()),
   }),
 ];
 
@@ -66,13 +66,13 @@ const logger = createLogger({
         )
       ),
     }),
-    dailyRotateFileTransport,
+    daily_rotate_file_transport,
   ],
-  exceptionHandlers,
-  rejectionHandlers,
+  exceptionHandlers: exception_handlers,
+  rejectionHandlers: rejection_handlers,
 });
 
-export const morganStream = {
+export const morgan_stream = {
   write: (message: string) => {
     logger.info(message.trim());
   },

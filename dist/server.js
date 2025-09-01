@@ -17,8 +17,8 @@ const app_1 = __importDefault(require("./app"));
 const config_1 = require("./app/config");
 const mongoose_1 = __importDefault(require("mongoose"));
 const logger_1 = __importDefault(require("./app/utils/serverTools/logger"));
+const worker_1 = require("./app/lib/rabbitMq/worker");
 const DB_1 = __importDefault(require("./app/DB"));
-const consumer_1 = require("./app/rabbitMq/jobs/consumer");
 process.on("uncaughtException", (err) => {
     logger_1.default.error("Uncaught exception:", err);
     process.exit(1);
@@ -28,10 +28,10 @@ process.on("unhandledRejection", (err) => {
     process.exit(1);
 });
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield mongoose_1.default.connect(config_1.appConfig.database.dataBase_uri);
+    yield mongoose_1.default.connect(config_1.appConfig.database.uri, {});
     logger_1.default.info("MongoDB connected");
-    yield (0, consumer_1.startJobConsumer)();
     yield (0, DB_1.default)();
+    (0, worker_1.start_consumers)();
     // Wait up to 15 minutes for request to finish uploading //
     app_1.default.setTimeout(15 * 60 * 1000);
     //------------------------//

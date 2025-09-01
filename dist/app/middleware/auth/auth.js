@@ -28,16 +28,16 @@ const auth = (...userRole) => (req, res, next) => __awaiter(void 0, void 0, void
         if (token === "null") {
             return next(new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized"));
         }
-        const decodedData = jwt_1.jsonWebToken.verifyJwt(token, config_1.appConfig.jwt.jwt_access_secret);
-        const userData = yield user_model_1.default.findById(decodedData.userId);
+        const decodedData = jwt_1.JsonWebToken.verify_jwt(token, config_1.appConfig.jwt.jwt_access_secret);
+        const userData = yield user_model_1.default.findById(decodedData.user_id);
         if (!userData) {
             return next(new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized"));
         }
-        if (userRole.length && !userRole.includes(decodedData.userRole)) {
+        if (userRole.length && !userRole.includes(decodedData.user_role)) {
             return next(new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized"));
         }
-        if (userData.role !== decodedData.userRole ||
-            userData.email !== decodedData.userEmail) {
+        if (userData.role !== decodedData.user_role ||
+            userData.email !== decodedData.user_email) {
             return next(new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized"));
         }
         req.user = decodedData;

@@ -6,14 +6,14 @@ export interface IBaseUser {
   role: TUserRole;
   password: string;
   authentication: {
-    expDate: Date;
+    exp_date: Date;
     otp: number;
     token: string;
   };
-  isVerified: boolean;
-  needToResetPass: boolean;
+  is_verified: boolean;
+  need_to_reset_password: boolean;
 }
 
 export interface IUser extends IBaseUser, Document {
-  comparePassword(enteredPassword: string): Promise<boolean>;
+  comparePassword(entered_password: string): Promise<boolean>;
 }

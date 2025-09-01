@@ -9,42 +9,40 @@ const path_1 = __importDefault(require("path"));
 dotenv_1.default.config({ path: path_1.default.join(process.cwd(), ".env") });
 exports.appConfig = {
     database: {
-        type: process.env.DB_TYPE,
-        host: process.env.DB_HOST,
-        port: parseInt(process.env.DB_PORT),
-        username: process.env.POSTGRES_USER,
-        password: process.env.POSTGRES_PASSWORD,
-        db_name: process.env.POSTGRES_DB,
-        dataBase_uri: process.env.DATABASE_URI, // Optional: if you're using full URI instead
+        uri: process.env.DATABASE_URI,
     },
     server: {
-        port: process.env.PORT,
-        node_env: process.env.NODE_ENV,
-        ip: process.env.IP_ADDRESS,
+        port: process.env.PORT || "4010",
+        node_env: process.env.NODE_ENV || "development",
+        ip: process.env.IP_ADDRESS || "0.0.0.0",
         baseurl: process.env.BASE_SERVER_URL,
     },
+    redis: {
+        host: process.env.REDIS_HOST || "redis",
+        port: parseInt(process.env.REDIS_PORT) || 6379,
+    },
     rabbitMq: {
-        url: process.env.RABBITMQ_URL,
+        url: process.env.RABBITMQ_URL || "amqp://guest:guest@rabbitmq:5672",
     },
     jwt: {
         jwt_access_secret: process.env.JWT_ACCESS_SECRET,
-        jwt_access_exprire: process.env.JWT_ACCESS_EXPIRE,
+        jwt_access_expire: process.env.JWT_ACCESS_EXPIRE,
         jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
-        jwt_refresh_exprire: process.env.JWT_REFRESH_EXPIRE,
+        jwt_refresh_expire: process.env.JWT_REFRESH_EXPIRE,
     },
     bcrypt: {
-        salt_round: process.env.SALT_ROUND,
+        salt_round: parseInt(process.env.SALT_ROUND) || 10,
     },
     email: {
         from: process.env.EMAIL_FROM,
         host: process.env.EMAIL_HOST,
-        port: parseInt(process.env.EMAIL_PORT),
+        port: parseInt(process.env.EMAIL_PORT) || 587,
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
     multer: {
-        file_size_limit: process.env.MAX_FILE_SIZE,
-        max_file_number: process.env.MAX_COUNT_FILE,
+        file_size_limit: parseInt(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024, // 5MB default
+        max_file_number: parseInt(process.env.MAX_COUNT_FILE) || 10,
     },
     admin: {
         email: process.env.ADMIN_EMAIL,
@@ -56,7 +54,7 @@ exports.appConfig = {
     },
     payment: {
         stripe: {
-            secret_key: process.env.SECRET_KEY,
+            secret_key: process.env.STRIPE_SECRET_KEY,
             webhook: process.env.STRIPE_WEBHOOK_SECRET,
         },
     },

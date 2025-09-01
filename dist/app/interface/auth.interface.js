@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userRole = exports.userRoles = void 0;
-exports.userRoles = {
+exports.user_role = exports.user_roles = void 0;
+exports.user_roles = {
     ADMIN: "ADMIN",
     USER: "USER",
 };
-exports.userRole = Object.values(exports.userRoles);
+exports.user_role = Object.values(exports.user_roles);

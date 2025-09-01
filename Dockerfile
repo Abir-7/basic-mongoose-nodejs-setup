@@ -13,8 +13,8 @@ RUN npm install
 # Copy all source files
 COPY . .
 
-# Build TypeScript (optional for dev mode but good to have)
+# Build TypeScript (optional)
 # RUN npm run build
 
-# Default command (can be overridden in docker-compose)
+# Default command (dev mode)
 CMD ["npm", "run", "dev"]

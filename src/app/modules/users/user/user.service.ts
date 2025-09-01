@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { UserProfile } from "../userProfile/userProfile.model";
+import { UserProfile } from "../user_profile/user_profile.model";
 
-const getMyData = async (userId: string) => {
+const get_my_data = async (userId: string) => {
   const user = await UserProfile.findOne({ user: userId }).populate("user");
   return user;
 };
 
 export const UserService = {
-  getMyData,
+  get_my_data,
 };

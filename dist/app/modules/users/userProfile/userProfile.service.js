@@ -13,42 +13,52 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserProfileService = void 0;
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 const http_status_1 = __importDefault(require("http-status"));
-const AppError_1 = __importDefault(require("../../../errors/AppError"));
+const appError_1 = __importDefault(require("../../../errors/appError"));
 const getRelativeFilePath_1 = require("../../../middleware/fileUpload/getRelativeFilePath");
 const user_model_1 = __importDefault(require("../user/user.model"));
 const unlinkFiles_1 = __importDefault(require("../../../middleware/fileUpload/unlinkFiles"));
 const userProfile_model_1 = require("./userProfile.model");
 const removeFalsyField_1 = require("../../../utils/helper/removeFalsyField");
-const updateProfileImage = (path, email) => __awaiter(void 0, void 0, void 0, function* () {
+const update_profile_image = (path, email) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.default.findOne({ email: email });
-    const image = (0, getRelativeFilePath_1.getRelativePath)(path);
+    const image = (0, getRelativeFilePath_1.get_relative_path)(path);
     if (!image) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Image not found.");
+        throw new appError_1.default(http_status_1.default.NOT_FOUND, "Image not found.");
     }
     if (!user) {
         (0, unlinkFiles_1.default)(image);
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found.");
+        throw new appError_1.default(http_status_1.default.NOT_FOUND, "User not found.");
     }
-    const updated = yield userProfile_model_1.UserProfile.findOneAndUpdate({ user: user._id }, { image }, { new: true });
-    if (!updated) {
+    const user_profile = yield userProfile_model_1.UserProfile.findOne({ user: user.id });
+    if (!user_profile) {
         (0, unlinkFiles_1.default)(image);
-        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Failed to update image.");
+        throw new appError_1.default(http_status_1.default.NOT_FOUND, "User profile not found.");
     }
-    return updated;
+    user_profile.image = image;
+    const saved_data = yield user_profile.save();
+    if (!saved_data) {
+        (0, unlinkFiles_1.default)(image);
+        throw new appError_1.default(http_status_1.default.BAD_REQUEST, "Failed to update image.");
+    }
+    if (user_profile && user_profile.image) {
+        (0, unlinkFiles_1.default)(user_profile.image);
+    }
+    return saved_data;
 });
-const updateProfileData = (userdata, email) => __awaiter(void 0, void 0, void 0, function* () {
+const update_profile_data = (userdata, email) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.default.findOne({ email: email });
     if (!user) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found.");
+        throw new appError_1.default(http_status_1.default.NOT_FOUND, "User not found.");
     }
     const data = (0, removeFalsyField_1.removeFalsyFields)(userdata);
     const updated = yield userProfile_model_1.UserProfile.findOneAndUpdate({ user: user._id }, data, {
         new: true,
     });
     if (!updated) {
-        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Failed to update user info.");
+        throw new appError_1.default(http_status_1.default.BAD_REQUEST, "Failed to update user info.");
     }
     return updated;
 });
-exports.UserProfileService = { updateProfileData, updateProfileImage };
+exports.UserProfileService = { update_profile_data, update_profile_image };

@@ -13,12 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.globalErrorHandler = void 0;
-const AppError_1 = __importDefault(require("../errors/AppError"));
+const appError_1 = __importDefault(require("../errors/appError"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const zodErrorHandler_1 = require("../errors/zodErrorHandler");
 const zod_1 = require("zod");
 const multer_1 = __importDefault(require("multer"));
-const MulterErrorHandler_1 = __importDefault(require("../errors/MulterErrorHandler"));
+const multerErrorHandler_1 = __importDefault(require("../errors/multerErrorHandler"));
 const logger_1 = __importDefault(require("../utils/serverTools/logger"));
 const globalErrorHandler = (err, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let statusCode = err.statusCode || 500;
@@ -77,12 +77,12 @@ const globalErrorHandler = (err, req, res, next) => __awaiter(void 0, void 0, vo
         ];
     }
     else if (err instanceof multer_1.default.MulterError) {
-        const multerError = (0, MulterErrorHandler_1.default)(err);
+        const multerError = (0, multerErrorHandler_1.default)(err);
         statusCode = multerError.statusCode;
         message = multerError.message;
         errors = multerError.errors;
     }
-    else if (err instanceof AppError_1.default) {
+    else if (err instanceof appError_1.default) {
         statusCode = err.statusCode;
         message = err.message;
         errors = [

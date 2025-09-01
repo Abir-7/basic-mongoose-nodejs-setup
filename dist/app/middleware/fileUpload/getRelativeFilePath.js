@@ -3,9 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRelativePath = void 0;
+exports.get_relative_path = void 0;
 const path_1 = __importDefault(require("path"));
-const getRelativePath = (filePath) => {
+const get_relative_path = (filePath) => {
     if (!filePath) {
         throw new Error("Path not found.");
     }
@@ -14,4 +14,4 @@ const getRelativePath = (filePath) => {
     // Replace backslashes with forward slashes for uniformity and add a leading "/"
     return "/" + relativePath.replace(/\\/g, "/");
 };
-exports.getRelativePath = getRelativePath;
+exports.get_relative_path = get_relative_path;

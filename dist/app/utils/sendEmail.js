@@ -18,7 +18,7 @@ exports.sendEmail = sendEmail;
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const http_status_1 = __importDefault(require("http-status"));
-const AppError_1 = __importDefault(require("../errors/AppError"));
+const appError_1 = __importDefault(require("../errors/appError"));
 const config_1 = require("../config");
 const logger_1 = __importDefault(require("./serverTools/logger"));
 function sendEmail(email, subject, text) {
@@ -138,7 +138,7 @@ function sendEmail(email, subject, text) {
         }
         catch (error) {
             logger_1.default.error("Error sending email", error);
-            throw new AppError_1.default(http_status_1.default.INTERNAL_SERVER_ERROR, "Error sending email");
+            throw new appError_1.default(http_status_1.default.INTERNAL_SERVER_ERROR, "Error sending email");
         }
     });
 }

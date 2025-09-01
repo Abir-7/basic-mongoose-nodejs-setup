@@ -17,10 +17,10 @@ const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../../utils/serverTools/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../../utils/serverTools/sendResponse"));
 const userProfile_service_1 = require("./userProfile.service");
-const updateProfileImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const update_profile_image = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const filePath = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
-    const result = yield userProfile_service_1.UserProfileService.updateProfileImage(filePath, req.user.userEmail);
+    const result = yield userProfile_service_1.UserProfileService.update_profile_image(filePath, req.user.user_email);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
@@ -28,9 +28,9 @@ const updateProfileImage = (0, catchAsync_1.default)((req, res) => __awaiter(voi
         data: result,
     });
 }));
-const updateProfileData = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const update_profile_data = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = req.body;
-    const result = yield userProfile_service_1.UserProfileService.updateProfileData(userData, req.user.userEmail);
+    const result = yield userProfile_service_1.UserProfileService.update_profile_data(userData, req.user.user_email);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
@@ -38,4 +38,7 @@ const updateProfileData = (0, catchAsync_1.default)((req, res) => __awaiter(void
         data: result,
     });
 }));
-exports.UserProfileController = { updateProfileData, updateProfileImage };
+exports.UserProfileController = {
+    update_profile_data,
+    update_profile_image,
+};

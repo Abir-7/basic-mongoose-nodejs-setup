@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
-const catchAsync_1 = __importDefault(require("../../../utils/serverTools/catchAsync"));
-const sendResponse_1 = __importDefault(require("../../../utils/serverTools/sendResponse"));
 const user_service_1 = require("./user.service");
-const getMyData = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_service_1.UserService.getMyData(req.user.userId);
-    (0, sendResponse_1.default)(res, {
+const send_response_1 = __importDefault(require("../../../utils/serverTools/send_response"));
+const catch_async_1 = __importDefault(require("../../../utils/serverTools/catch_async"));
+const get_my_data = (0, catch_async_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_service_1.UserService.get_my_data(req.user.user_id);
+    (0, send_response_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
         message: "User data is fetched successfully",
@@ -27,5 +27,5 @@ const getMyData = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
     });
 }));
 exports.UserController = {
-    getMyData,
+    get_my_data,
 };

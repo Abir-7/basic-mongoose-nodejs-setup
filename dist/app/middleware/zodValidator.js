@@ -16,7 +16,7 @@ const zod_1 = require("zod");
 const unlinkFiles_1 = __importDefault(require("./fileUpload/unlinkFiles"));
 const getRelativeFilePath_1 = require("./fileUpload/getRelativeFilePath");
 const catchAsync_1 = __importDefault(require("../utils/serverTools/catchAsync"));
-const zodValidator = (schema) => (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const zod_validator = (schema) => (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     try {
         yield schema.parseAsync({ body: req.body });
@@ -25,11 +25,11 @@ const zodValidator = (schema) => (0, catchAsync_1.default)((req, res, next) => _
     catch (error) {
         if (error instanceof zod_1.ZodError) {
             if ((_a = req.file) === null || _a === void 0 ? void 0 : _a.path) {
-                (0, unlinkFiles_1.default)((0, getRelativeFilePath_1.getRelativePath)((_b = req.file) === null || _b === void 0 ? void 0 : _b.path));
+                (0, unlinkFiles_1.default)((0, getRelativeFilePath_1.get_relative_path)((_b = req.file) === null || _b === void 0 ? void 0 : _b.path));
             }
             return next(error);
         }
         return next(error);
     }
 }));
-exports.default = zodValidator;
+exports.default = zod_validator;
