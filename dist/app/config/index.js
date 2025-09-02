@@ -3,11 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.appConfig = void 0;
+exports.app_config = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
 dotenv_1.default.config({ path: path_1.default.join(process.cwd(), ".env") });
-exports.appConfig = {
+exports.app_config = {
     database: {
         uri: process.env.DATABASE_URI,
     },
@@ -21,7 +21,7 @@ exports.appConfig = {
         host: process.env.REDIS_HOST || "redis",
         port: parseInt(process.env.REDIS_PORT) || 6379,
     },
-    rabbitMq: {
+    rabbit_mq: {
         url: process.env.RABBITMQ_URL || "amqp://guest:guest@rabbitmq:5672",
     },
     jwt: {

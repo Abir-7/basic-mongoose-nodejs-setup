@@ -24,7 +24,7 @@ const create_user = (0, catch_async_1.default)((req, res) => __awaiter(void 0, v
     const result = yield auth_service_1.AuthService.create_user(userData);
     (0, send_response_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.OK,
+        status_code: http_status_1.default.OK,
         message: "User successfully created.Check your email for code.",
         data: result,
     });
@@ -32,12 +32,12 @@ const create_user = (0, catch_async_1.default)((req, res) => __awaiter(void 0, v
 const user_login = (0, catch_async_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield auth_service_1.AuthService.user_login(req.body);
     res.cookie("refreshToken", result.refresh_token, {
-        secure: config_1.appConfig.server.node_env === "production",
+        secure: config_1.app_config.server.node_env === "production",
         httpOnly: true,
     });
     (0, send_response_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.OK,
+        status_code: http_status_1.default.OK,
         message: "User login successfull",
         data: result,
     });
@@ -47,7 +47,7 @@ const verify_user = (0, catch_async_1.default)((req, res, next) => __awaiter(voi
     const result = yield auth_service_1.AuthService.verify_user(email, Number(otp));
     (0, send_response_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.OK,
+        status_code: http_status_1.default.OK,
         message: "Email successfully verified.",
         data: result,
     });
@@ -57,7 +57,7 @@ const forgot_password_request = (0, catch_async_1.default)((req, res, next) => _
     const result = yield auth_service_1.AuthService.forgot_password_request(email);
     (0, send_response_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.OK,
+        status_code: http_status_1.default.OK,
         message: "A verification code is sent to your email.",
         data: result,
     });
@@ -68,7 +68,7 @@ const reset_password = (0, catch_async_1.default)((req, res, next) => __awaiter(
     const result = yield auth_service_1.AuthService.reset_password(token, req.body);
     (0, send_response_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.OK,
+        status_code: http_status_1.default.OK,
         message: "Password reset successfully",
         data: result,
     });
@@ -79,7 +79,7 @@ const get_new_access_token = (0, catch_async_1.default)((req, res) => __awaiter(
     (0, send_response_1.default)(res, {
         data: result,
         success: true,
-        statusCode: http_status_1.default.OK,
+        status_code: http_status_1.default.OK,
         message: "New access-token is created.",
     });
 }));
@@ -89,7 +89,7 @@ const update_password = (0, catch_async_1.default)((req, res) => __awaiter(void 
     (0, send_response_1.default)(res, {
         data: result,
         success: true,
-        statusCode: http_status_1.default.OK,
+        status_code: http_status_1.default.OK,
         message: "Password successfully updated",
     });
 }));
@@ -99,7 +99,7 @@ const re_send_otp = (0, catch_async_1.default)((req, res) => __awaiter(void 0, v
     (0, send_response_1.default)(res, {
         data: result,
         success: true,
-        statusCode: http_status_1.default.OK,
+        status_code: http_status_1.default.OK,
         message: "Verification Code send successfully",
     });
 }));

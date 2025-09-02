@@ -1,11 +1,11 @@
 // utils/encryptor.ts
 import crypto from "crypto";
-import { appConfig } from "../../config";
+import { app_config } from "../../config";
 
 const algorithm = "aes-256-cbc";
 const secretKey = crypto
   .createHash("sha256")
-  .update(appConfig.encrypt.s_key as string) // 🔐 use env var in production
+  .update(app_config.encrypt.s_key as string) // 🔐 use env var in production
   .digest("base64")
   .substr(0, 32); // 32 bytes for aes-256
 

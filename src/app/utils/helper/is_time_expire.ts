@@ -1,12 +1,12 @@
-export const is_time_expired = (expiryTime: string | Date): boolean => {
+export const is_time_expired = (expiry_time: string | Date): boolean => {
   const now = new Date();
-  const expiryDate =
-    typeof expiryTime === "string" ? new Date(expiryTime) : expiryTime;
+  const expiry_date =
+    typeof expiry_time === "string" ? new Date(expiry_time) : expiry_time;
 
-  // If expiryDate is invalid, consider expired (optional)
-  if (isNaN(expiryDate.getTime())) {
+  // If expiry_date is invalid, consider expired (optional)
+  if (isNaN(expiry_date.getTime())) {
     return true;
   }
 
-  return expiryDate <= now;
+  return expiry_date <= now;
 };

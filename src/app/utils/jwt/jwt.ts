@@ -3,7 +3,8 @@
 import jwt from "jsonwebtoken";
 import { IAuthData } from "../../interface/auth.interface";
 import { jwtDecode } from "jwt-decode";
-const verify_jwt = (token: string, secret: string) => {
+
+const verify_jwt_token = (token: string, secret: string) => {
   try {
     return jwt.verify(token, secret) as IAuthData;
   } catch (error: any) {
@@ -11,17 +12,22 @@ const verify_jwt = (token: string, secret: string) => {
   }
 };
 
-const generate_token = (payload: object, secret: string, expiresIn: any) => {
+const generate_jwt_token = (
+  payload: object,
+  secret: string,
+  expires_in: any
+) => {
   try {
     const token = jwt.sign(payload, secret, {
-      expiresIn,
+      expiresIn: expires_in,
     });
     return token;
   } catch (error: any) {
     throw new Error(error);
   }
 };
-const decode_token = (token: string) => {
+
+const decode_jwt_token = (token: string) => {
   try {
     const decoded = jwtDecode(token);
     return decoded;
@@ -30,8 +36,8 @@ const decode_token = (token: string) => {
   }
 };
 
-export const JsonWebToken = {
-  verify_jwt,
-  generate_token,
-  decode_token,
+export const json_web_token = {
+  verify_jwt_token,
+  generate_jwt_token,
+  decode_jwt_token,
 };

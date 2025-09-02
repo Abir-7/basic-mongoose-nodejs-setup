@@ -22,13 +22,13 @@ const user_profile_model_1 = require("../modules/users/user_profile/user_profile
 const auth_interface_1 = require("../interface/auth.interface");
 const super_user = {
     role: auth_interface_1.user_roles.ADMIN,
-    email: config_1.appConfig.admin.email,
-    password: config_1.appConfig.admin.password,
+    email: config_1.app_config.admin.email,
+    password: config_1.app_config.admin.password,
     is_verified: true,
 };
 const super_user_profile = {
     full_name: "Admin-1",
-    email: config_1.appConfig.admin.email,
+    email: config_1.app_config.admin.email,
 };
 const seed_admin = () => __awaiter(void 0, void 0, void 0, function* () {
     const is_exist_super_admin = yield user_model_1.default.findOne({

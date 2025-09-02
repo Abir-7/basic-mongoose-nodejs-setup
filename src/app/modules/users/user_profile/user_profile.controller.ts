@@ -1,7 +1,8 @@
 import status from "http-status";
+
+import { UserProfileService } from "./user_profile.service";
 import catch_async from "../../../utils/serverTools/catch_async";
 import send_response from "../../../utils/serverTools/send_response";
-import { UserProfileService } from "./user_profile.service";
 
 const update_profile_image = catch_async(async (req, res) => {
   const filePath = req.file?.path;
@@ -12,7 +13,7 @@ const update_profile_image = catch_async(async (req, res) => {
   );
   send_response(res, {
     success: true,
-    statusCode: status.OK,
+    status_code: status.OK,
     message: "Profile image changed successfully.",
     data: result,
   });
@@ -27,7 +28,7 @@ const update_profile_data = catch_async(async (req, res) => {
   );
   send_response(res, {
     success: true,
-    statusCode: status.OK,
+    status_code: status.OK,
     message: "Profile info updated successfully.",
     data: result,
   });

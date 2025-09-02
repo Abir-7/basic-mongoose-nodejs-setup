@@ -4,9 +4,9 @@ import AppError from "../../errors/AppError";
 import status from "http-status";
 import { TUserRole } from "../../interface/auth.interface";
 
-import { JsonWebToken } from "../../utils/jwt/jwt";
-import { appConfig } from "../../config";
+import { app_config } from "../../config";
 import User from "../../modules/users/user/user.model";
+import { json_web_token } from "../../utils/jwt/jwt";
 
 export const auth =
   (...userRole: TUserRole[]) =>
@@ -28,9 +28,9 @@ export const auth =
         );
       }
 
-      const decodedData = JsonWebToken.verify_jwt(
+      const decodedData = json_web_token.verify_jwt_token(
         token,
-        appConfig.jwt.jwt_access_secret as string
+        app_config.jwt.jwt_access_secret as string
       );
 
       const userData = await User.findById(decodedData.user_id);

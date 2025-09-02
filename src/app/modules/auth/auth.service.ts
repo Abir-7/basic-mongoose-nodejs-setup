@@ -3,18 +3,17 @@ import status from "http-status";
 import AppError from "../../errors/AppError";
 import User from "../users/user/user.model";
 
-import { JsonWebToken } from "../../utils/jwt/jwt";
-
 import { UserProfile } from "../users/user_profile/user_profile.model";
 import get_expiry_time from "../../utils/helper/get_expiry_time";
 import get_otp from "../../utils/helper/get_otp";
 import { send_email } from "../../utils/send_email";
 import get_hashed_password from "../../utils/helper/get_hashed_password";
-import { appConfig } from "../../config";
+import { app_config } from "../../config";
 import { IUser } from "../users/user/user.interface";
 import mongoose from "mongoose";
 import { is_time_expired } from "../../utils/helper/is_time_expire";
-import { publishJob } from "../../lib/rabbitMq/publisher";
+import { publish_job } from "../../lib/rabbitMq/publisher";
+import { json_web_token } from "../../utils/jwt/jwt";
 
 const create_user = async (data: {
   email: string;
@@ -58,7 +57,7 @@ const create_user = async (data: {
     };
     await UserProfile.create([userProfileData], { session });
 
-    await publishJob("emailQueue", {
+    await publish_job("emailQueue", {
       to: data.email,
       subject: "Email Verification Code",
       body: otp.toString(),
@@ -110,16 +109,16 @@ const user_login = async (loginData: {
     user_role: userData.role,
   };
 
-  const accessToken = JsonWebToken.generate_token(
+  const accessToken = json_web_token.generate_jwt_token(
     jwtPayload,
-    appConfig.jwt.jwt_access_secret as string,
-    appConfig.jwt.jwt_access_expire
+    app_config.jwt.jwt_access_secret as string,
+    app_config.jwt.jwt_access_expire
   );
 
-  const refreshToken = JsonWebToken.generate_token(
+  const refreshToken = json_web_token.generate_jwt_token(
     jwtPayload,
-    appConfig.jwt.jwt_refresh_secret as string,
-    appConfig.jwt.jwt_refresh_expire
+    app_config.jwt.jwt_refresh_secret as string,
+    app_config.jwt.jwt_refresh_expire
   );
 
   return {
@@ -161,9 +160,9 @@ const verify_user = async (
   let updatedUser;
   let token = null;
   if (user.is_verified) {
-    token = JsonWebToken.generate_token(
+    token = json_web_token.generate_jwt_token(
       { userEmail: user.email },
-      appConfig.jwt.jwt_access_secret as string,
+      app_config.jwt.jwt_access_secret as string,
       "10m"
     );
 
@@ -219,7 +218,7 @@ const forgot_password_request = async (
     token: null,
   };
 
-  await publishJob("emailQueue", {
+  await publish_job("emailQueue", {
     to: email,
     subject: "Reset Password Verification Code",
     body: otp.toString(),
@@ -269,9 +268,9 @@ const reset_password = async (
     );
   }
 
-  const decode = JsonWebToken.verify_jwt(
+  const decode = json_web_token.verify_jwt_token(
     token,
-    appConfig.jwt.jwt_access_secret as string
+    app_config.jwt.jwt_access_secret as string
   );
 
   const hassedPassword = await get_hashed_password(new_password);
@@ -300,9 +299,9 @@ const get_new_access_token = async (
   if (!refreshToken) {
     throw new AppError(status.UNAUTHORIZED, "Refresh token not found.");
   }
-  const decode = JsonWebToken.verify_jwt(
+  const decode = json_web_token.verify_jwt_token(
     refreshToken,
-    appConfig.jwt.jwt_refresh_secret as string
+    app_config.jwt.jwt_refresh_secret as string
   );
 
   const { user_email, user_id, user_role } = decode;
@@ -314,10 +313,10 @@ const get_new_access_token = async (
       user_role: user_role,
     };
 
-    const accessToken = JsonWebToken.generate_token(
+    const accessToken = json_web_token.generate_jwt_token(
       jwtPayload,
-      appConfig.jwt.jwt_access_secret as string,
-      appConfig.jwt.jwt_access_expire
+      app_config.jwt.jwt_access_secret as string,
+      app_config.jwt.jwt_access_expire
     );
     return { accessToken };
   } else {

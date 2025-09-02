@@ -1,8 +1,8 @@
 import { Response } from "express";
 
 interface IMeta {
-  totalItem: number;
-  totalPage: number;
+  total_item: number;
+  total_page: number;
   limit: number;
   page: number;
 }
@@ -10,16 +10,16 @@ interface IMeta {
 interface IResponse<T> {
   success: boolean;
   message: string;
-  statusCode: number;
+  status_code: number;
   data: T;
   meta?: IMeta;
 }
 
 const send_response = <T>(res: Response, data: IResponse<T>): void => {
-  res.status(data.statusCode).send({
+  res.status(data.status_code).send({
     success: data.success,
     message: data.message,
-    statusCode: data.statusCode,
+    status_code: data.status_code,
     data: data.data,
     meta: data.meta,
   });

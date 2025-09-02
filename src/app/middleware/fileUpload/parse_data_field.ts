@@ -4,12 +4,11 @@ import { Request, Response, NextFunction } from "express";
 import AppError from "../../errors/AppError";
 
 export const parse_data_field =
-  (fieldName: string) =>
+  (field_name: string) =>
   (req: Request, res: Response, next: NextFunction): void => {
     try {
-      if (req.body[fieldName]) {
-        req.body = JSON.parse(req.body[fieldName]);
-
+      if (req.body[field_name]) {
+        req.body = JSON.parse(req.body[field_name]);
         next();
       } else {
         next();

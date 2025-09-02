@@ -21,7 +21,7 @@ const get_my_data = (0, catch_async_1.default)((req, res) => __awaiter(void 0, v
     const result = yield user_service_1.UserService.get_my_data(req.user.user_id);
     (0, send_response_1.default)(res, {
         success: true,
-        statusCode: http_status_1.default.OK,
+        status_code: http_status_1.default.OK,
         message: "User data is fetched successfully",
         data: result,
     });

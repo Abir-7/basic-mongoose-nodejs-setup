@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from "mongoose";
-import { appConfig } from "../config";
+import { app_config } from "../config";
 
 import User from "../modules/users/user/user.model";
 import logger from "../utils/serverTools/logger";
@@ -10,14 +10,14 @@ import { user_roles } from "../interface/auth.interface";
 
 const super_user = {
   role: user_roles.ADMIN,
-  email: appConfig.admin.email,
-  password: appConfig.admin.password,
+  email: app_config.admin.email,
+  password: app_config.admin.password,
   is_verified: true,
 };
 
 const super_user_profile = {
   full_name: "Admin-1",
-  email: appConfig.admin.email,
+  email: app_config.admin.email,
 };
 
 const seed_admin = async (): Promise<void> => {

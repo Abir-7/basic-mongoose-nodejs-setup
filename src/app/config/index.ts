@@ -3,7 +3,7 @@ import path from "path";
 
 dotenv.config({ path: path.join(process.cwd(), ".env") });
 
-export const appConfig = {
+export const app_config = {
   database: {
     uri: process.env.DATABASE_URI,
   },
@@ -17,7 +17,7 @@ export const appConfig = {
     host: process.env.REDIS_HOST || "redis",
     port: parseInt(process.env.REDIS_PORT as string) || 6379,
   },
-  rabbitMq: {
+  rabbit_mq: {
     url: process.env.RABBITMQ_URL || "amqp://guest:guest@rabbitmq:5672",
   },
   jwt: {

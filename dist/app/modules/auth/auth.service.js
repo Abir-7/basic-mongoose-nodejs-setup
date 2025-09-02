@@ -17,7 +17,6 @@ exports.AuthService = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const user_model_1 = __importDefault(require("../users/user/user.model"));
-const jwt_1 = require("../../utils/jwt/jwt");
 const user_profile_model_1 = require("../users/user_profile/user_profile.model");
 const get_expiry_time_1 = __importDefault(require("../../utils/helper/get_expiry_time"));
 const get_otp_1 = __importDefault(require("../../utils/helper/get_otp"));
@@ -27,6 +26,7 @@ const config_1 = require("../../config");
 const mongoose_1 = __importDefault(require("mongoose"));
 const is_time_expire_1 = require("../../utils/helper/is_time_expire");
 const publisher_1 = require("../../lib/rabbitMq/publisher");
+const jwt_1 = require("../../utils/jwt/jwt");
 const create_user = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
@@ -55,7 +55,7 @@ const create_user = (data) => __awaiter(void 0, void 0, void 0, function* () {
             user: createdUser[0]._id,
         };
         yield user_profile_model_1.UserProfile.create([userProfileData], { session });
-        yield (0, publisher_1.publishJob)("emailQueue", {
+        yield (0, publisher_1.publish_job)("emailQueue", {
             to: data.email,
             subject: "Email Verification Code",
             body: otp.toString(),
@@ -90,8 +90,8 @@ const user_login = (loginData) => __awaiter(void 0, void 0, void 0, function* ()
         user_id: userData._id,
         user_role: userData.role,
     };
-    const accessToken = jwt_1.JsonWebToken.generate_token(jwtPayload, config_1.appConfig.jwt.jwt_access_secret, config_1.appConfig.jwt.jwt_access_expire);
-    const refreshToken = jwt_1.JsonWebToken.generate_token(jwtPayload, config_1.appConfig.jwt.jwt_refresh_secret, config_1.appConfig.jwt.jwt_refresh_expire);
+    const accessToken = jwt_1.json_web_token.generate_jwt_token(jwtPayload, config_1.app_config.jwt.jwt_access_secret, config_1.app_config.jwt.jwt_access_expire);
+    const refreshToken = jwt_1.json_web_token.generate_jwt_token(jwtPayload, config_1.app_config.jwt.jwt_refresh_secret, config_1.app_config.jwt.jwt_refresh_expire);
     return {
         access_token: accessToken,
         refresh_token: refreshToken,
@@ -117,7 +117,7 @@ const verify_user = (email, otp) => __awaiter(void 0, void 0, void 0, function* 
     let updatedUser;
     let token = null;
     if (user.is_verified) {
-        token = jwt_1.JsonWebToken.generate_token({ userEmail: user.email }, config_1.appConfig.jwt.jwt_access_secret, "10m");
+        token = jwt_1.json_web_token.generate_jwt_token({ userEmail: user.email }, config_1.app_config.jwt.jwt_access_secret, "10m");
         const exp_date = (0, get_expiry_time_1.default)(10);
         updatedUser = yield user_model_1.default.findOneAndUpdate({ email: user.email }, {
             "authentication.otp": null,
@@ -154,7 +154,7 @@ const forgot_password_request = (email) => __awaiter(void 0, void 0, void 0, fun
         need_to_reset_password: false,
         token: null,
     };
-    yield (0, publisher_1.publishJob)("emailQueue", {
+    yield (0, publisher_1.publish_job)("emailQueue", {
         to: email,
         subject: "Reset Password Verification Code",
         body: otp.toString(),
@@ -179,7 +179,7 @@ const reset_password = (token, user_data) => __awaiter(void 0, void 0, void 0, f
     if (new_password !== confirm_password) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "New password and Confirm password doesn't match!");
     }
-    const decode = jwt_1.JsonWebToken.verify_jwt(token, config_1.appConfig.jwt.jwt_access_secret);
+    const decode = jwt_1.json_web_token.verify_jwt_token(token, config_1.app_config.jwt.jwt_access_secret);
     const hassedPassword = yield (0, get_hashed_password_1.default)(new_password);
     const updateData = yield user_model_1.default.findOneAndUpdate({ email: decode.user_email }, {
         password: hassedPassword,
@@ -195,7 +195,7 @@ const get_new_access_token = (refreshToken) => __awaiter(void 0, void 0, void 0,
     if (!refreshToken) {
         throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "Refresh token not found.");
     }
-    const decode = jwt_1.JsonWebToken.verify_jwt(refreshToken, config_1.appConfig.jwt.jwt_refresh_secret);
+    const decode = jwt_1.json_web_token.verify_jwt_token(refreshToken, config_1.app_config.jwt.jwt_refresh_secret);
     const { user_email, user_id, user_role } = decode;
     if (user_email && user_id && user_role) {
         const jwtPayload = {
@@ -203,7 +203,7 @@ const get_new_access_token = (refreshToken) => __awaiter(void 0, void 0, void 0,
             user_id: user_id,
             user_role: user_role,
         };
-        const accessToken = jwt_1.JsonWebToken.generate_token(jwtPayload, config_1.appConfig.jwt.jwt_access_secret, config_1.appConfig.jwt.jwt_access_expire);
+        const accessToken = jwt_1.json_web_token.generate_jwt_token(jwtPayload, config_1.app_config.jwt.jwt_access_secret, config_1.app_config.jwt.jwt_access_expire);
         return { accessToken };
     }
     else {

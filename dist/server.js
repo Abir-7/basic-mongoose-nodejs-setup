@@ -28,15 +28,15 @@ process.on("unhandledRejection", (err) => {
     process.exit(1);
 });
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield mongoose_1.default.connect(config_1.appConfig.database.uri, {});
+    yield mongoose_1.default.connect(config_1.app_config.database.uri, {});
     logger_1.default.info("MongoDB connected");
     yield (0, DB_1.default)();
     (0, worker_1.start_consumers)();
     // Wait up to 15 minutes for request to finish uploading //
     app_1.default.setTimeout(15 * 60 * 1000);
     //------------------------//
-    app_1.default.listen(Number(config_1.appConfig.server.port), config_1.appConfig.server.ip, () => {
-        logger_1.default.info(`Example app listening on port ${config_1.appConfig.server.port} & ip:${config_1.appConfig.server.ip}`);
+    app_1.default.listen(Number(config_1.app_config.server.port), config_1.app_config.server.ip, () => {
+        logger_1.default.info(`Example app listening on port ${config_1.app_config.server.port} & ip:${config_1.app_config.server.ip}`);
     });
 });
 main().catch((err) => logger_1.default.error("Error connecting to MongoDB:", err));
@@ -46,7 +46,7 @@ main().catch((err) => logger_1.default.error("Error connecting to MongoDB:", err
 // dotenv.config();
 // import mongoose from "mongoose";
 // import server from "./app";
-// import { appConfig } from "./app/config";
+// import { app_config } from "./app/config";
 // import logger from "./app/utils/serverTools/logger";
 // import seedAdmin from "./app/DB";
 // const numCPUs = os.cpus().length;
@@ -82,7 +82,7 @@ main().catch((err) => logger_1.default.error("Error connecting to MongoDB:", err
 //     process.exit(1);
 //   });
 //   const main = async () => {
-//     const mongoUri = appConfig.database.dataBase_uri as string;
+//     const mongoUri = app_config.database.dataBase_uri as string;
 //     if (!mongoUri) {
 //       logger.error("MongoDB connection URI is not defined!");
 //       process.exit(1);
@@ -92,8 +92,8 @@ main().catch((err) => logger_1.default.error("Error connecting to MongoDB:", err
 //     await seedAdmin();
 //     // Increase server timeout for long uploads (15 minutes)
 //     server.setTimeout(15 * 60 * 1000);
-//     const port = Number(appConfig.server.port) || 3000;
-//     const ip = appConfig.server.ip || "0.0.0.0";
+//     const port = Number(app_config.server.port) || 3000;
+//     const ip = app_config.server.ip || "0.0.0.0";
 //     server.listen(port, ip, () => {
 //       logger.info(`Worker ${process.pid} listening on ${ip}:${port}`);
 //     });

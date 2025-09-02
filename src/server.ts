@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 import server from "./app";
-import { appConfig } from "./app/config";
+import { app_config } from "./app/config";
 import mongoose from "mongoose";
 import logger from "./app/utils/serverTools/logger";
 
@@ -20,7 +20,7 @@ process.on("unhandledRejection", (err) => {
 });
 
 const main = async () => {
-  await mongoose.connect(appConfig.database.uri as string, {});
+  await mongoose.connect(app_config.database.uri as string, {});
   logger.info("MongoDB connected");
   await seed_admin();
 
@@ -29,12 +29,12 @@ const main = async () => {
   server.setTimeout(15 * 60 * 1000);
   //------------------------//
   server.listen(
-    Number(appConfig.server.port),
-    appConfig.server.ip as string,
+    Number(app_config.server.port),
+    app_config.server.ip as string,
     () => {
       logger.info(
-        `Example app listening on port ${appConfig.server.port} & ip:${
-          appConfig.server.ip as string
+        `Example app listening on port ${app_config.server.port} & ip:${
+          app_config.server.ip as string
         }`
       );
     }
@@ -49,7 +49,7 @@ main().catch((err) => logger.error("Error connecting to MongoDB:", err));
 
 // import mongoose from "mongoose";
 // import server from "./app";
-// import { appConfig } from "./app/config";
+// import { app_config } from "./app/config";
 // import logger from "./app/utils/serverTools/logger";
 // import seedAdmin from "./app/DB";
 
@@ -93,7 +93,7 @@ main().catch((err) => logger.error("Error connecting to MongoDB:", err));
 //   });
 
 //   const main = async () => {
-//     const mongoUri = appConfig.database.dataBase_uri as string;
+//     const mongoUri = app_config.database.dataBase_uri as string;
 
 //     if (!mongoUri) {
 //       logger.error("MongoDB connection URI is not defined!");
@@ -108,8 +108,8 @@ main().catch((err) => logger.error("Error connecting to MongoDB:", err));
 //     // Increase server timeout for long uploads (15 minutes)
 //     server.setTimeout(15 * 60 * 1000);
 
-//     const port = Number(appConfig.server.port) || 3000;
-//     const ip = appConfig.server.ip || "0.0.0.0";
+//     const port = Number(app_config.server.port) || 3000;
+//     const ip = app_config.server.ip || "0.0.0.0";
 
 //     server.listen(port, ip, () => {
 //       logger.info(`Worker ${process.pid} listening on ${ip}:${port}`);

@@ -15,9 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.auth = void 0;
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const http_status_1 = __importDefault(require("http-status"));
-const jwt_1 = require("../../utils/jwt/jwt");
 const config_1 = require("../../config");
 const user_model_1 = __importDefault(require("../../modules/users/user/user.model"));
+const jwt_1 = require("../../utils/jwt/jwt");
 const auth = (...userRole) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const tokenWithBearer = req.headers.authorization;
@@ -28,7 +28,7 @@ const auth = (...userRole) => (req, res, next) => __awaiter(void 0, void 0, void
         if (token === "null") {
             return next(new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized"));
         }
-        const decodedData = jwt_1.JsonWebToken.verify_jwt(token, config_1.appConfig.jwt.jwt_access_secret);
+        const decodedData = jwt_1.json_web_token.verify_jwt_token(token, config_1.app_config.jwt.jwt_access_secret);
         const userData = yield user_model_1.default.findById(decodedData.user_id);
         if (!userData) {
             return next(new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized"));

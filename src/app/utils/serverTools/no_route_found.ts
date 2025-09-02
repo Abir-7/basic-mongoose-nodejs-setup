@@ -4,7 +4,7 @@ import { RequestHandler } from "express";
 export const no_route_found: RequestHandler = (req, res, next) => {
   res.status(404).send({
     success: false,
-    statusCode: 404,
-    message: "Api not found!",
+    status_code: 404,
+    message: "API not found!",
   });
 };

@@ -46,7 +46,7 @@ const update_profile_image = async (path: string, email: string) => {
 };
 
 const update_profile_data = async (
-  userdata: Partial<IUserProfile>,
+  user_data: Partial<IUserProfile>,
   email: string
 ): Promise<IUserProfile | null> => {
   const user = await User.findOne({ email: email });
@@ -54,7 +54,7 @@ const update_profile_data = async (
   if (!user) {
     throw new AppError(status.NOT_FOUND, "User not found.");
   }
-  const data = remove_falsy_fields(userdata);
+  const data = remove_falsy_fields(user_data);
   const updated = await UserProfile.findOneAndUpdate({ user: user._id }, data, {
     new: true,
   });

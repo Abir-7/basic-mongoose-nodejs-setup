@@ -4,7 +4,7 @@ import logger from "../../utils/serverTools/logger";
 import { consume_queue } from "./consumer";
 
 export const start_consumers = () => {
-  consume_queue("emailQueue", async (job) => {
+  consume_queue("email_queue", async (job) => {
     const { to, subject, body } = job;
     try {
       logger.info(`Processing job: ${to}, ${subject}`);

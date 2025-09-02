@@ -9,7 +9,7 @@ const get_my_data = catch_async(async (req, res) => {
 
   send_response(res, {
     success: true,
-    statusCode: status.OK,
+    status_code: status.OK,
     message: "User data is fetched successfully",
     data: result,
   });

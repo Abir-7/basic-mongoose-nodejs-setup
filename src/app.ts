@@ -4,20 +4,21 @@ import router from "./app/routes";
 import http from "http";
 import { global_error_handler } from "./app/middleware/global_error_handler";
 
-import cookieParser from "cookie-parser";
+import cookie_parser from "cookie-parser";
 import path from "path";
 import compression from "compression";
 
 import helmet from "helmet";
 import morgan from "morgan";
-import { StripeController } from "./app/modules/stripe/stripe.controller";
+
 import { no_route_found } from "./app/utils/serverTools/no_route_found";
 import { limiter } from "./app/utils/serverTools/rate_limit";
+import { StripeController } from "./app/modules/stripe/stripe.controller";
 
 const app = express();
 
-const corsOption = {
-  origin: ["*"], // need to add real htp link like "https://yourdomain.com", "http://localhost:3000"
+const cors_options = {
+  origin: ["*"], // need to add real http link like "https://yourdomain.com", "http://localhost:3000"
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   credentials: true,
 };
@@ -25,13 +26,13 @@ const corsOption = {
 app.use(helmet());
 app.use(morgan("combined"));
 app.use(compression());
-app.use(cors(corsOption));
-app.use(cookieParser());
+app.use(cors(cors_options));
+app.use(cookie_parser());
 app.set("trust proxy", true);
 app.use(
   "/api/stripe/webhook",
   express.raw({ type: "application/json" }),
-  StripeController.stripeWebhook
+  StripeController.stripe_webhook
 );
 
 app.use(express.json());
@@ -48,6 +49,7 @@ app.use(express.static(path.join(process.cwd(), "uploads")));
 
 app.use(global_error_handler);
 app.use(no_route_found);
+
 const server = http.createServer(app);
 
 export default server;
