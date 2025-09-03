@@ -173,7 +173,7 @@ const verify_email = async (user_id: string, otp: number) => {
     access_token,
     refresh_token,
     access_token_valid_till,
-    refresh_token_valid_till,
+    refresh_token_valid_till,  role: updated_user.role,
   };
 };
 
