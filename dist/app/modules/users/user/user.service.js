@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const user_profile_model_1 = require("../user_profile/user_profile.model");
 const get_my_data = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_profile_model_1.UserProfile.findOne({ user: userId }).populate("user");
+    const user = yield user_profile_model_1.UserProfile.findOne({ user: userId }).populate("PARENT");
     return user;
 });
 exports.UserService = {

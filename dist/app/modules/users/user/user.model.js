@@ -34,17 +34,17 @@ const user_schema = new mongoose_1.Schema({
         required: true,
     },
     authentication: {
-        exp_date: {
+        expires_at: {
             type: Date,
-            required: true,
+            default: null,
         },
         otp: {
             type: Number,
-            required: true,
+            default: null,
         },
         token: {
             type: String,
-            required: true,
+            default: null,
         },
     },
     is_verified: {
@@ -66,5 +66,5 @@ user_schema.methods.comparePassword = function (entered_password) {
         }
     });
 };
-const User = (0, mongoose_1.model)("User", user_schema);
+const User = (0, mongoose_1.model)("USER", user_schema);
 exports.default = User;

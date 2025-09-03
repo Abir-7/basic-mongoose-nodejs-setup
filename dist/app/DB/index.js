@@ -42,7 +42,9 @@ const seed_admin = () => __awaiter(void 0, void 0, void 0, function* () {
     session.startTransaction();
     try {
         super_user.password = yield (0, get_hashed_password_1.default)(super_user.password);
-        const data = yield user_model_1.default.create([super_user], { session });
+        const data = yield user_model_1.default.create([
+            Object.assign(Object.assign({}, super_user), { authentication: { expires_at: null, otp: null, token: null } }),
+        ], { session });
         yield user_profile_model_1.UserProfile.create([Object.assign(Object.assign({}, super_user_profile), { user: data[0]._id })], {
             session,
         });

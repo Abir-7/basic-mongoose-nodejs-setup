@@ -31,7 +31,7 @@ const create_user = (0, catch_async_1.default)((req, res) => __awaiter(void 0, v
 }));
 const user_login = (0, catch_async_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield auth_service_1.AuthService.user_login(req.body);
-    res.cookie("refreshToken", result.refresh_token, {
+    res.cookie("refresh_token", result.refresh_token, {
         secure: config_1.app_config.server.node_env === "production",
         httpOnly: true,
     });
@@ -42,9 +42,19 @@ const user_login = (0, catch_async_1.default)((req, res, next) => __awaiter(void
         data: result,
     });
 }));
-const verify_user = (0, catch_async_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, otp } = req.body;
-    const result = yield auth_service_1.AuthService.verify_user(email, Number(otp));
+const verify_email = (0, catch_async_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user_id, otp } = req.body;
+    const result = yield auth_service_1.AuthService.verify_email(user_id, Number(otp));
+    (0, send_response_1.default)(res, {
+        success: true,
+        status_code: http_status_1.default.OK,
+        message: "Email successfully verified.",
+        data: result,
+    });
+}));
+const verify_reset = (0, catch_async_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user_id, otp } = req.body;
+    const result = yield auth_service_1.AuthService.verify_reset(user_id, Number(otp));
     (0, send_response_1.default)(res, {
         success: true,
         status_code: http_status_1.default.OK,
@@ -74,8 +84,8 @@ const reset_password = (0, catch_async_1.default)((req, res, next) => __awaiter(
     });
 }));
 const get_new_access_token = (0, catch_async_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
-    const result = yield auth_service_1.AuthService.get_new_access_token(refreshToken);
+    const refresh_token = req.cookies.refresh_token || req.body.refresh_token;
+    const result = yield auth_service_1.AuthService.get_new_access_token(refresh_token);
     (0, send_response_1.default)(res, {
         data: result,
         success: true,
@@ -94,8 +104,8 @@ const update_password = (0, catch_async_1.default)((req, res) => __awaiter(void 
     });
 }));
 const re_send_otp = (0, catch_async_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.body;
-    const result = yield auth_service_1.AuthService.re_send_otp(email);
+    const { user_id } = req.body;
+    const result = yield auth_service_1.AuthService.re_send_otp(user_id);
     (0, send_response_1.default)(res, {
         data: result,
         success: true,
@@ -105,11 +115,12 @@ const re_send_otp = (0, catch_async_1.default)((req, res) => __awaiter(void 0, v
 }));
 exports.AuthController = {
     create_user,
-    verify_user,
+    verify_email,
     forgot_password_request,
     reset_password,
     user_login,
     get_new_access_token,
     update_password,
     re_send_otp,
+    verify_reset,
 };

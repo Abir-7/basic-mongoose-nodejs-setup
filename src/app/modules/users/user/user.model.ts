@@ -24,17 +24,17 @@ const user_schema = new Schema<IUser>(
       required: true,
     },
     authentication: {
-      exp_date: {
+      expires_at: {
         type: Date,
-        required: true,
+        default: null,
       },
       otp: {
         type: Number,
-        required: true,
+        default: null,
       },
       token: {
         type: String,
-        required: true,
+        default: null,
       },
     },
     is_verified: {
@@ -58,6 +58,6 @@ user_schema.methods.comparePassword = async function (
   }
 };
 
-const User = model<IUser>("User", user_schema);
+const User = model<IUser>("USER", user_schema);
 
 export default User;
