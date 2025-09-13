@@ -7,8 +7,8 @@ import catch_async from "../../utils/serverTools/catch_async";
 import send_response from "../../utils/serverTools/send_response";
 
 const create_user = catch_async(async (req, res) => {
-  const userData = req.body;
-  const result = await AuthService.create_user(userData);
+  const user_data = req.body;
+  const result = await AuthService.create_user(user_data);
 
   send_response(res, {
     success: true,
@@ -71,8 +71,8 @@ const forgot_password_request = catch_async(async (req, res, next) => {
 });
 
 const reset_password = catch_async(async (req, res, next) => {
-  const tokenWithBearer = req.headers.authorization as string;
-  const token = tokenWithBearer.split(" ")[1];
+  const token_with_bearer = req.headers.authorization as string;
+  const token = token_with_bearer.split(" ")[1];
 
   const result = await AuthService.reset_password(token as string, req.body);
 
