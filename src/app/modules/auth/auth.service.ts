@@ -31,25 +31,25 @@ const create_user = async (data: {
   session.startTransaction();
 
   try {
-    const isExist = await User.findOne({ email: data.email }).session(session);
+    const is_exist = await User.findOne({ email: data.email }).session(session);
 
-    if (isExist && isExist.is_verified === true) {
+    if (is_exist && is_exist.is_verified === true) {
       throw new AppError(status.BAD_REQUEST, "User already exist");
     }
 
-    if (isExist && isExist.is_verified === false) {
-      await User.findOneAndDelete({ _id: isExist._id }).session(session);
-      await UserProfile.findOneAndDelete({ user: isExist._id }).session(
+    if (is_exist && is_exist.is_verified === false) {
+      await User.findOneAndDelete({ _id: is_exist._id }).session(session);
+      await UserProfile.findOneAndDelete({ user: is_exist._id }).session(
         session
       );
     }
 
-    const hashedPassword = await get_hashed_password(data.password);
+    const hashed_password = await get_hashed_password(data.password);
     const otp = get_otp(4);
 
     const user_data = {
       email: data.email,
-      password: hashedPassword,
+      password: hashed_password,
       authentication: { otp, expires_at },
     };
 
