@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { auth } from "../../middleware/auth/auth";
+import { auth } from "../../../middleware/auth/auth";
 import { StripeController } from "./stripe.controller";
 
 const router = Router();

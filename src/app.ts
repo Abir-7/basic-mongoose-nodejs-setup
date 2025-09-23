@@ -13,7 +13,7 @@ import morgan from "morgan";
 
 import { no_route_found } from "./app/utils/serverTools/no_route_found";
 import { limiter } from "./app/utils/serverTools/rate_limit";
-import { StripeController } from "./app/modules/stripe/stripe.controller";
+import { StripeController } from "./app/modules/payment_method/stripe/stripe.controller";
 
 const app = express();
 

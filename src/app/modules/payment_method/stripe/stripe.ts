@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { app_config } from "../../config";
+import { app_config } from "../../../config";
 
 export const BILLING_INTERVALS = ["day", "week", "month", "year"] as const;
 

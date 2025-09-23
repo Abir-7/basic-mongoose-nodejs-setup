@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { zod_update_profile_schema } from "./user_profile.validation";
-import { upload } from "../../../middleware/fileUpload/file_upload_handler";
+import { upload } from "../../../middleware/fileUpload/multer";
 import { auth } from "../../../middleware/auth/auth";
 import { UserProfileController } from "./user_profile.controller";
 import zod_validator from "../../../middleware/zod_validator";

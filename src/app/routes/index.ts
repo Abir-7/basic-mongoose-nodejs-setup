@@ -2,7 +2,7 @@ import { Router } from "express";
 import { UserRoute } from "../modules/users/user/user.route";
 import { AuthRoute } from "../modules/auth/auth.route";
 import { UserProfileRoute } from "../modules/users/user_profile/user_profile.route";
-import { StripeRoute } from "../modules/stripe/stripe.route";
+import { StripeRoute } from "../modules/payment_method/stripe/stripe.route";
 
 const router = Router();
 const api_routes = [

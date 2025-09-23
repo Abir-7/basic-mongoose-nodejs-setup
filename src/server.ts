@@ -5,7 +5,7 @@ import { app_config } from "./app/config";
 import mongoose from "mongoose";
 import logger from "./app/utils/serverTools/logger";
 
-import { start_consumers } from "./app/lib/rabbitMq/worker";
+import { start_consumers } from "./app/services/rabbitMq/worker";
 import seed_admin from "./app/DB";
 
 process.on("uncaughtException", (err) => {

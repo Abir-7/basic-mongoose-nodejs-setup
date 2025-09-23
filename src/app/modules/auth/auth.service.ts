@@ -13,7 +13,7 @@ import { app_config } from "../../config";
 
 import mongoose from "mongoose";
 
-import { publish_job } from "../../lib/rabbitMq/publisher";
+import { publish_job } from "../../services/rabbitMq/publisher";
 import { json_web_token } from "../../utils/jwt/jwt";
 import { TUserRole } from "../../interface/auth.interface";
 import { generate_tokens } from "../../helperFunction/general/generate_token";

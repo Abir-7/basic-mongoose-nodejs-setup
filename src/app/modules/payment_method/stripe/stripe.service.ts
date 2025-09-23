@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable arrow-body-style */
 import Stripe from "stripe";
-import { app_config } from "../../config";
-import logger from "../../utils/serverTools/logger";
+import { app_config } from "../../../config";
+import logger from "../../../utils/serverTools/logger";
 import stripe from "./stripe";
 
 const stripe_webhook = async (raw_body: Buffer, sig: string) => {
